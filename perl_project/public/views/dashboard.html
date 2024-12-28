@@ -174,15 +174,8 @@
 
         <!-- Session Section -->
         <div class="col-md-4 section-box">
-          <h5 class="mb-3">Session</h5>
-          <select class="form-select mb-2">
-            <option selected>2024/2025 I</option>
-            <option>2024/2025 II</option>
-            <option>2025/2026 I</option>
-          </select>
-          <a href="lecturer-viewAllLink.html" class="btn btn-light w-100"
-            >Personal Google Link</a
-          >
+          <h5 class="mb-3">All Personal Links</h5>
+          <a href="viewAllLink.html" class="btn btn-light w-100">View Links</a>
         </div>
       </div>
     </div>
@@ -191,11 +184,18 @@
     <div class="container">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h5>Group Shared Link</h5>
-        <button class="btn btn-outline-secondary">Create Group +</button>
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          data-bs-toggle="modal"
+          data-bs-target="#createGroupModal"
+        >
+          Create Group +
+        </button>
       </div>
       <div class="row">
         <div class="col-md-4">
-          <a href="lecturer-groupShareLink.html" class="group-card-link">
+          <a href="groupShareLink.html" class="group-card-link">
             <div class="group-card">
               <h5 class="group-card-title">
                 SECR3104-3 APPLICATION DEVELOPMENT
@@ -274,6 +274,84 @@
             <ul class="list-group" id="category-list">
               <!-- Categories will be dynamically inserted here -->
             </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Create Group Modal -->
+    <div
+      class="modal fade"
+      id="createGroupModal"
+      tabindex="-1"
+      aria-labelledby="createGroupModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="createGroupModalLabel">
+              Create Group Share Link
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="createGroupForm">
+              <div class="mb-3">
+                <label for="groupTitle" class="form-label">Group Title</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="groupTitle"
+                  placeholder=""
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="groupDescription" class="form-label">
+                  Description Group
+                </label>
+                <textarea
+                  class="form-control"
+                  id="groupDescription"
+                  rows="3"
+                  placeholder=""
+                  required
+                ></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="participants" class="form-label"
+                  >Participants</label
+                >
+                <div class="input-group">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="participants"
+                    placeholder=""
+                  />
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    id="addParticipantBtn"
+                  >
+                    Add
+                  </button>
+                </div>
+                <div id="participantList" class="mt-2">
+                  <!-- Dynamically added participants will appear here -->
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-danger" form="createGroupForm">
+              Create
+            </button>
           </div>
         </div>
       </div>

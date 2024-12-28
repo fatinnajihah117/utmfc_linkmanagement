@@ -2,6 +2,82 @@ package CRUD;
 
 use JSON::XS;
 
+
+#ADMIN SIDE
+# Function to add a category
+sub createCategory {
+    my ($dbh, $json) = @_;
+
+    my $category_name = $json->{'category_name'};
+    my $sth = $dbh->prepare('INSERT INTO category (category_name) VALUES (?)');
+
+    unless ($sth) {
+        return {
+            success => 0,
+            error   => "Prepare statement failed: " . $dbh->errstr,
+        };
+    }
+
+    my $success = $sth->execute($category_name);
+
+    unless ($success) {
+        return {
+            success => 0,
+            error   => "Execution failed: " . $dbh->errstr,
+        };
+    }
+
+    return {
+        success   => 1,
+        operation => "CREATE",
+        inserted  => { category_name => $category_name },
+    };
+}
+
+# Function to add a session
+sub createSession {
+    my ($dbh, $json) = @_;
+
+    my $session_name = $json->{'session_name'};
+    my $sth = $dbh->prepare('INSERT INTO session (session_name) VALUES (?)');
+
+    unless ($sth) {
+        return {
+            success => 0,
+            error   => "Prepare statement failed: " . $dbh->errstr,
+        };
+    }
+
+    my $success = $sth->execute($session_name);
+
+    unless ($success) {
+        return {
+            success => 0,
+            error   => "Execution failed: " . $dbh->errstr,
+        };
+    }
+
+    return {
+        success   => 1,
+        operation => "CREATE",
+        inserted  => { session_name => $session_name },
+    };
+}
+# Function to get all rows from a table
+sub getAll {
+    my ($dbh, $table) = @_;
+    my $sth = $dbh->prepare("SELECT * FROM $table");
+
+    unless ($sth) {
+        return { error => "Prepare statement failed: " . $dbh->errstr };
+    }
+
+    $sth->execute();
+    my $rows = $sth->fetchall_arrayref({});
+    return $rows;
+}
+
+#USER SIDE
 sub createJSON {
     my $dbh  = shift(@_);
     my $json = shift(@_);

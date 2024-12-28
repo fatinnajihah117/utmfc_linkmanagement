@@ -89,23 +89,23 @@
           <img
             alt="UTM Logo"
             height="40"
-            src="C:\Users\budak\OneDrive\Desktop\AD PROJECT\GDLinks\images\UTM-LOGO-FULL.png"
+            src="..\images\UTM-LOGO-FULL.png"
             style="width: auto"
           />
         </a>
         <div class="collapse navbar-collapse">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <a class="nav-link" href="lecturer-dashboard.html">HOME</a>
+              <a class="nav-link" href="dashboard.html">HOME</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="lecturer-sentLink.html">SENT LINKS</a>
+              <a class="nav-link active" href="profile.html">PROFILE</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="lecturer-feedbackForm.html">FEEDBACK</a>
+              <a class="nav-link" href="..\loginPage.html">LOGOUT</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="profile.html">UTM LECTURER</a>
+              <a class="nav-link" href="#"> UTM ROLE</a>
             </li>
           </ul>
         </div>
@@ -180,6 +180,19 @@
     </div>
 
     <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Get user role from localStorage
+        const userRole = localStorage.getItem("userRole") || "UTM LECTURER";
+        console.log(localStorage.getItem("userRole"));
+        console.log(userRole);
+        // Update the UTM ROLE nav item with the user role
+        const roleNavItem = document.querySelector(
+          '.nav-item a.nav-link[href="#"]'
+        );
+        if (roleNavItem) {
+          roleNavItem.textContent = userRole;
+        }
+      });
       const profilePictureContainer = document.getElementById(
         "profilePictureContainer"
       );

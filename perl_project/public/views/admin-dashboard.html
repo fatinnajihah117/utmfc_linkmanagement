@@ -1,0 +1,310 @@
+<html>
+  <head>
+    <title>Dashboard</title>
+    <link
+      crossorigin="anonymous"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f0ecec;
+      }
+      .navbar {
+        background-color: #fff;
+        border-bottom: 2px solid #900c3f;
+      }
+      .navbar-brand img {
+        height: 40px;
+      }
+      .navbar-nav .nav-link {
+        color: #000;
+        font-weight: bold;
+        margin-right: 15px;
+      }
+
+      .navbar-nav .nav-link.active {
+        color: #900c3f;
+        border-bottom: 3px solid #900c3f;
+      }
+      .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .card-header {
+        background-color: #ffffff;
+        border-bottom: none;
+        font-weight: bold;
+      }
+      .card-body {
+        padding: 1rem;
+      }
+      .btn-add-category {
+        background-color: #800000;
+        color: #ffffff;
+        border-radius: 20px;
+        padding: 0.5rem 1.5rem;
+      }
+      .btn-add-session {
+        background-color: #800000;
+        color: #ffffff;
+        border-radius: 20px;
+        padding: 0.5rem 1.5rem;
+      }
+      .btn-add:hover {
+        background-color: #660000;
+      }
+      .user-type {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem;
+        border-radius: 10px;
+        color: #ffffff;
+        font-weight: bold;
+      }
+      .user-type i {
+        font-size: 1.5rem;
+      }
+      .lecturers {
+        background-color: #d1c4e9;
+      }
+      .students {
+        background-color: #f8bbd0;
+      }
+      .staff {
+        background-color: #bbdefb;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <img
+            alt="UTM Logo"
+            height="40"
+            src="..\images\UTM-LOGO-FULL.png"
+            style="width: auto"
+          />
+        </a>
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link active" href="admin-dashboard.html">HOME</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="..\loginPage.html">LOGOUT</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- Main Content -->
+    <div class="container mt-4">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="card">
+            <div class="card-header">Overall Users</div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-4">
+                  <img
+                    alt="Pie chart showing user distribution"
+                    class="img-fluid"
+                    height="100"
+                    src="https://storage.googleapis.com/a1aa/image/C9orAvqN6bbILFGZ6aOyoPPvoXb2TeErpnrxXSbtnS428J5JA.jpg"
+                    width="100"
+                  />
+                </div>
+                <div class="col-md-8">
+                  <a
+                    href="admin-lecturerList.html"
+                    class="text-decoration-none"
+                  >
+                    <div class="user-type lecturers mb-2">
+                      <span> Lecturers </span>
+                      <span>
+                        231
+                        <i class="fas fa-chalkboard-teacher"> </i>
+                      </span>
+                    </div>
+                  </a>
+                  <a href="admin-studentList.html" class="text-decoration-none">
+                    <div class="user-type students mb-2">
+                      <span> Students </span>
+                      <span>
+                        231
+                        <i class="fas fa-user-graduate"> </i>
+                      </span>
+                    </div>
+                  </a>
+                  <a href="admin-staffList.html" class="text-decoration-none">
+                    <div class="user-type staff">
+                      <span> UTM Staff </span>
+                      <span>
+                        231
+                        <i class="fas fa-user-tie"> </i>
+                      </span>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <!-- Category Card -->
+          <div class="card">
+            <div class="card-header">Category</div>
+            <div class="card-body">
+              <ul id="categoryList" class="list-group"></ul>
+              <button
+                class="btn btn-add-category mt-3"
+                data-bs-toggle="modal"
+                data-bs-target="#addCategoryModal"
+              >
+                Add Category
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <!-- Session Card -->
+          <div class="card">
+            <div class="card-header">Session</div>
+            <div class="card-body">
+              <ul id="sessionList" class="list-group"></ul>
+              <button
+                class="btn btn-add-session mt-3"
+                data-bs-toggle="modal"
+                data-bs-target="#addSessionModal"
+              >
+                Add Session
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add Category Modal -->
+    <div
+      class="modal fade"
+      id="addCategoryModal"
+      tabindex="-1"
+      aria-labelledby="addCategoryLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addCategoryLabel">Add New Category</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="addCategoryForm">
+              <div class="mb-3">
+                <label for="categoryInput" class="form-label">Enter New Category:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="categoryInput"
+                  placeholder="Category Name"
+                  required
+                />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary" form="addCategoryForm">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Session Modal -->
+    <div
+      class="modal fade"
+      id="addSessionModal"
+      tabindex="-1"
+      aria-labelledby="addSessionLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addSessionLabel">Add New Session</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="addSessionForm">
+              <div class="mb-3">
+                <label for="sessionInput" class="form-label">Enter New Session:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="sessionInput"
+                  placeholder="Session Name"
+                  required
+                />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary" form="addSessionForm">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Optional: Handle form submissions (example code)
+      document.getElementById("addCategoryForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const categoryValue = document.getElementById("categoryInput").value;
+        alert(`Category "${categoryValue}" added!`);
+        document.getElementById("categoryInput").value = "";
+        const modal = bootstrap.Modal.getInstance(document.getElementById("addCategoryModal"));
+        modal.hide();
+      });
+
+      document.getElementById("addSessionForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const sessionValue = document.getElementById("sessionInput").value;
+        alert(`Session "${sessionValue}" added!`);
+        document.getElementById("sessionInput").value = "";
+        const modal = bootstrap.Modal.getInstance(document.getElementById("addSessionModal"));
+        modal.hide();
+      });
+    </script>
+        <script
+        crossorigin="anonymous"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-CmHRfGz5F6SpC+dF5xBZkkKmvZe9sLsH9L9z0CI49MRN1+EJGABiGfmhzRyK4tPZ"
+      ></script>
+  </body>
+</html>

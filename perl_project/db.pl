@@ -15,6 +15,37 @@ my $dbh = DBI->connect("DBI:MariaDB:database=$database;host=localhost", $user, $
 
 get '/' => {text => 'GD Links AJAX/JSON Service'};
 
+#ADMIN SIDE
+# Route to add a category
+post '/add-category' => sub ($c) {
+    my $json = $c->req->json;
+
+    my $result = CRUD::createCategory($dbh, $json);
+
+    $c->render(json => $result);
+};
+
+# Route to add a session
+post '/add-session' => sub ($c) {
+    my $json = $c->req->json;
+
+    my $result = CRUD::createSession($dbh, $json);
+
+    $c->render(json => $result);
+};
+# Route to get all categories
+get '/get-category' => sub ($c) {
+    my $categories = CRUD::getAll($dbh, 'category');
+    $c->render(json => $categories);
+};
+
+# Route to get all sessions
+get '/get-session' => sub ($c) {
+    my $sessions = CRUD::getAll($dbh, 'session');
+    $c->render(json => $sessions);
+};
+
+
 ### http://localhost:3000/create?jsonStr={"category":"Internship", "ref_name":"Evaluation Form", "sessem":"2023/2024-1", "description":"Borang Penilaian Latihan Industri oleh Penyelia Fakulti", "owner":"norsham@utm.my", "link":"https://forms.gle/"}
 ### http://localhost:3000/create?jsonStr={"table":"gdlinks", "data":{"category":"Internship", "ref_name":"Visit Form", "sessem":"2023/2024-1", "description":"Borang lawatan latihan praktik", "owner":"norsham@utm.my", "link":"https://forms.gle/"}}
 get '/create' => sub ($c) {
