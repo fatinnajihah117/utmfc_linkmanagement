@@ -75,23 +75,72 @@ get '/update' => sub ($c) {
     $c->render(json=>$result);
 };
 
-post '/updateLink' => sub ($c) {
-    my $jsonStr = $c->param('jsonStr');
+post '/update' => sub ($c) {
+    my $jsonStr = $c->req->body;
 
-    my $json = decode_json($jsonStr);
+    unless ($jsonStr) {
+        return $c->render(json => { success => 0, error => 'Missing request body' }, status => 400);
+    }
+
+    my $json = eval { decode_json($jsonStr) };
+    if ($@) {
+        return $c->render(json => { success => 0, error => 'Invalid JSON format' }, status => 400);
+    }
+
+    unless ($json->{table} && $json->{id} && $json->{data}) {
+        return $c->render(
+            json => { success => 0, error => 'Missing table, ID, or data' },
+            status => 400
+        );
+    }
+
     my $result = CRUD::updateJSON($dbh, $json);
-    $c->render(json=>$result);
+    $c->render(json => $result);
 };
 
 
+
 ### http://localhost:3000/delete?jsonStr={"table":"gdlinks", "id":15}
+# GET route for /delete
 get '/delete' => sub ($c) {
     my $jsonStr = $c->param('jsonStr');
 
-    my $json = decode_json($jsonStr);
-    my $result = CRUD::deleteJSON($dbh, $json);
+    unless ($jsonStr) {
+        return $c->render(json => { success => 0, error => 'Missing jsonStr parameter' }, status => 400);
+    }
 
-    $c->render(json=>$result);
+    my $json = eval { decode_json($jsonStr) };
+    if ($@) {
+        return $c->render(json => { success => 0, error => 'Invalid JSON format' }, status => 400);
+    }
+
+    unless ($json->{table} && $json->{id}) {
+        return $c->render(json => { success => 0, error => 'Missing table or ID' }, status => 400);
+    }
+
+    my $result = CRUD::deleteJSON($dbh, $json);
+    $c->render(json => $result);
+};
+
+# POST route for /delete
+post '/delete' => sub ($c) {
+    my $jsonStr = $c->req->body;
+
+    unless ($jsonStr) {
+        return $c->render(json => { success => 0, error => 'Missing request body' }, status => 400);
+    }
+
+    my $json = eval { decode_json($jsonStr) };
+    if ($@) {
+        return $c->render(json => { success => 0, error => 'Invalid JSON format' }, status => 400);
+    }
+
+    unless ($json->{table} && $json->{id}) {
+        return $c->render(json => { success => 0, error => 'Missing table or ID' }, status => 400);
+    }
+
+    my $result = CRUD::deleteJSON($dbh, $json);
+    $c->render(json => $result);
 };
 
 ### http://localhost:3000/check?jsonStr={"username":"B23CS0036","password":"020618010998"}

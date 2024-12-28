@@ -184,7 +184,7 @@ body {
 
 
               if (response.userExists === 1) {
-                  // User exists, redirect to lecturer-dashboard.html
+                  // User exists, redirect to dashboard.html
                   //fetch checkurl again sbb nak store userID dan userRole
                   fetch(checkUserUrl)
                       .then(res => {
@@ -198,9 +198,9 @@ body {
                           localStorage.setItem("userRole", userData.userData.role);
                           localStorage.setItem("userId", userData.userData.userID);
 
-                          // Redirect to lecturer-dashboard.html
-                          console.log("Redirecting to lecturer-dashboard.html", localStorage);
-                          window.location.href = "views/lecturer-dashboard.html";
+                          // Redirect to dashboard.html
+                          console.log("Redirecting to dashboard.html", localStorage);
+                          window.location.href = "views/dashboard.html";
                       })
                       .catch(err => console.error("Error fetching user data from database:", err));
               } else {

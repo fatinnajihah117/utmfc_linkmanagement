@@ -179,21 +179,27 @@ sub deleteJSON {
 
     my $table = $json->{'table'};
     my $id = $json->{'id'};
+    my $userID = $json->{'userID'};
 
     if ($table eq "link") {
-        my $sth_user_link = $dbh->prepare('DELETE FROM user_link WHERE linkID=?') or die 'prepare statement failed: ' . $dbh->errstr();
+        # Validate the user has permission to delete the link
+        my $sth_check = $dbh->prepare('SELECT COUNT(*) FROM user_link WHERE linkID=? AND userID=?');
+        $sth_check->execute($id, $userID);
+        my ($count) = $sth_check->fetchrow_array();
+
+        unless ($count) {
+            return { success => 0, error => "Permission denied or record not found" };
+        }
+
+        # Delete from user_link
+        my $sth_user_link = $dbh->prepare('DELETE FROM user_link WHERE linkID=?');
         $sth_user_link->execute($id) or die 'execution failed: ' . $dbh->errstr();
 
-        my $sth_link = $dbh->prepare('DELETE FROM link WHERE linkID=?') or die 'prepare statement failed: ' . $dbh->errstr();
+        # Delete from link
+        my $sth_link = $dbh->prepare('DELETE FROM link WHERE linkID=?');
         $sth_link->execute($id) or die 'execution failed: ' . $dbh->errstr();
 
-        $json->{'operation'} = "DELETE";
-        return $json;
-    } elsif ($table eq "users") {
-        my $sth = $dbh->prepare('DELETE FROM users WHERE userID=?') or die 'prepare statement failed: ' . $dbh->errstr();
-        $sth->execute($id) or die 'execution failed: ' . $dbh->errstr();
-        $json->{'operation'} = "DELETE";
-        return $json;
+        return { success => 1, operation => "DELETE", id => $id };
     }
 
     return {

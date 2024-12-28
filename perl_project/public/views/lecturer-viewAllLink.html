@@ -78,23 +78,23 @@
           <img
             alt="UTM Logo"
             height="40"
-            src="C:\Users\budak\OneDrive\Desktop\AD PROJECT\GDLinks\images\UTM-LOGO-FULL.png"
+            src="..\images\UTM-LOGO-FULL.png"
             style="width: auto"
           />
         </a>
         <div class="collapse navbar-collapse">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <a class="nav-link active" href="lecturer-dashboard.html">HOME</a>
+              <a class="nav-link active" href="dashboard.html">HOME</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="lecturer-sentLink.html">SENT LINKS</a>
+              <a class="nav-link" href="profile.html">PROFILE</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="lecturer-feedbackForm.html">FEEDBACK</a>
+              <a class="nav-link" href="..\loginPage.html">LOGOUT</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="profile.html">UTM LECTURER</a>
+              <a class="nav-link" href="#"> UTM ROLE</a>
             </li>
           </ul>
         </div>
@@ -185,15 +185,17 @@
             <form id="addForm">
               <!--Category dan Session dalam bentuk dropdown-->
               <div class="mb-3">
-                <label for="categoryDropdown" class="form-label">Category</label>
+                <label for="categoryDropdown" class="form-label"
+                  >Category</label
+                >
                 <select id="categoryDropdown" class="form-select" required>
-                    <option value=""></option>
+                  <option value=""></option>
                 </select>
               </div>
               <div class="mb-3">
                 <label for="sessionDropdown" class="form-label">Session</label>
                 <select id="sessionDropdown" class="form-select" required>
-                    <option value=""></option>
+                  <option value=""></option>
                 </select>
               </div>
               <div class="mb-3">
@@ -205,7 +207,7 @@
                   required
                 />
               </div>
-              
+
               <div class="mb-3">
                 <label for="addDescription" class="form-label"
                   >Description</label
@@ -228,15 +230,22 @@
       </div>
     </div>
     <!-- Update Modal -->
-    <div class="modal fade" id="updateModal" tabindex="-1" aria-hidden="true">
+    <div
+      class="modal fade"
+      id="updateModal"
+      tabindex="-1"
+      aria-labelledby="updateModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Update Link</h5>
+            <h5 class="modal-title" id="updateModalLabel">Update Link</h5>
             <button
               type="button"
               class="btn-close"
               data-bs-dismiss="modal"
+              aria-label="Close"
             ></button>
           </div>
           <div class="modal-body">
@@ -244,28 +253,62 @@
               <input type="hidden" id="updateId" />
               <div class="mb-3">
                 <label for="updateCategory" class="form-label">Category</label>
-                <input type="text" id="updateCategory" class="form-control" />
+                <input
+                  type="text"
+                  class="form-control"
+                  id="updateCategory"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="updateSession" class="form-label">Session</label>
+                <input type="text" class="form-control" id="updateSession" />
               </div>
               <div class="mb-3">
                 <label for="updateOwner" class="form-label">Owner</label>
-                <input type="text" id="updateOwner" class="form-control" />
+                <input
+                  type="text"
+                  class="form-control"
+                  id="updateOwner"
+                  required
+                />
               </div>
               <div class="mb-3">
                 <label for="updateDescription" class="form-label"
                   >Description</label
                 >
-                <input
-                  type="text"
-                  id="updateDescription"
+                <textarea
                   class="form-control"
-                />
+                  id="updateDescription"
+                  required
+                ></textarea>
               </div>
               <div class="mb-3">
                 <label for="updateLink" class="form-label">Link</label>
-                <input type="url" id="updateLink" class="form-control" />
+                <input
+                  type="url"
+                  class="form-control"
+                  id="updateLink"
+                  required
+                />
               </div>
-              <button type="submit" class="btn btn-primary">Update</button>
             </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="updateRow(event)"
+            >
+              Save changes
+            </button>
           </div>
         </div>
       </div>
@@ -273,18 +316,18 @@
     <!--Add Script-->
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-            // Get user role from localStorage
-            const userRole = localStorage.getItem("userRole") || "UTM LECTURER";
-            console.log(localStorage.getItem("userRole"));
-            console.log(userRole);
-            // Update the nav item with the user role
-            const navItem = document.querySelector('.nav-item a.nav-link[href="profile.html"]');
-            if (navItem) {
-                navItem.textContent = userRole;
-            }
-
-
-        });
+        // Get user role from localStorage
+        const userRole = localStorage.getItem("userRole") || "UTM LECTURER";
+        console.log(localStorage.getItem("userRole"));
+        console.log(userRole);
+        // Update the UTM ROLE nav item with the user role
+        const roleNavItem = document.querySelector(
+          '.nav-item a.nav-link[href="#"]'
+        );
+        if (roleNavItem) {
+          roleNavItem.textContent = userRole;
+        }
+      });
       function openAddModal() {
         // Reset the form
         document.getElementById("addForm").reset();
@@ -299,7 +342,7 @@
       async function loadTableData() {
         try {
           const userID = localStorage.getItem("userId"); // Retrieve userID from localStorage
-          console.log("userID: ",localStorage.getItem("userId"));
+          console.log("userID: ", localStorage.getItem("userId"));
           if (!userID) {
             alert("UserID not found. Please log in.");
             return;
@@ -311,7 +354,9 @@
           });
           console.log(jsonStr);
 
-          const response = await fetch(`/read?jsonStr=${encodeURIComponent(jsonStr)}`);
+          const response = await fetch(
+            `/read?jsonStr=${encodeURIComponent(jsonStr)}`
+          );
           const data = await response.json();
 
           const tableBody = document.querySelector("table tbody");
@@ -328,7 +373,11 @@
                 <td>${row.description}</td>
                 <td><a href="${row.links}" target="_blank">${row.links}</a></td>
                 <td class="btn-action">
-                  <button class="btn-edit" onclick="openUpdateModal(${row.id}, '${row.category}', '${row.session}',  '${row.owner}', '${row.description}', '${row.links}')">
+                  <button class="btn-edit" onclick="openUpdateModal(${
+                    row.id
+                  }, '${row.category}', '${row.session}',  '${row.owner}', '${
+              row.description
+            }', '${row.links}')">
                     <i class="bi bi-pencil-square"></i>
                   </button>
                   <button class="btn-delete" onclick="deleteRow(${row.id})">
@@ -344,56 +393,59 @@
         }
       }
       async function loadCategories() {
-        const url = `/read?jsonStr=${encodeURIComponent(JSON.stringify({ table: 'category' }))}`;
+        const url = `/read?jsonStr=${encodeURIComponent(
+          JSON.stringify({ table: "category" })
+        )}`;
 
-          fetch(url, {
-              method: 'GET',
-          })
-              .then(response => response.json())
-              .then(data => {
-                  console.log('Fetched categories:', data.categories);
-                  if (data.categories && data.categories.length > 0) {
-                      const categorySelect = document.getElementById('categoryDropdown');
-                      data.categories.forEach(category => {
-                          const option = document.createElement('option');
-                          option.value = category;
-                          option.text = category;
-                          categorySelect.appendChild(option);
-                      });
-                  } else {
-                      console.log('No categories found');
-                  }
-              })
-              .catch(error => {
-                  console.error('Error fetching categories:', error);
+        fetch(url, {
+          method: "GET",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Fetched categories:", data.categories);
+            if (data.categories && data.categories.length > 0) {
+              const categorySelect =
+                document.getElementById("categoryDropdown");
+              data.categories.forEach((category) => {
+                const option = document.createElement("option");
+                option.value = category;
+                option.text = category;
+                categorySelect.appendChild(option);
               });
-      
+            } else {
+              console.log("No categories found");
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching categories:", error);
+          });
       }
       async function loadSessions() {
-        const url = `/read?jsonStr=${encodeURIComponent(JSON.stringify({ table: 'session' }))}`;
+        const url = `/read?jsonStr=${encodeURIComponent(
+          JSON.stringify({ table: "session" })
+        )}`;
 
-          fetch(url, {
-              method: 'GET',
-          })
-              .then(response => response.json())
-              .then(data => {
-                  console.log('Fetched sessions:', data.sessions);
-                  if (data.sessions && data.sessions.length > 0) {
-                      const sessionSelect = document.getElementById('sessionDropdown');
-                      data.sessions.forEach(session => {
-                          const option = document.createElement('option');
-                          option.value = session;
-                          option.text = session;
-                          sessionSelect.appendChild(option);
-                      });
-                  } else {
-                      console.log('No session found');
-                  }
-              })
-              .catch(error => {
-                  console.error('Error fetching session:', error);
+        fetch(url, {
+          method: "GET",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Fetched sessions:", data.sessions);
+            if (data.sessions && data.sessions.length > 0) {
+              const sessionSelect = document.getElementById("sessionDropdown");
+              data.sessions.forEach((session) => {
+                const option = document.createElement("option");
+                option.value = session;
+                option.text = session;
+                sessionSelect.appendChild(option);
               });
-      
+            } else {
+              console.log("No session found");
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching session:", error);
+          });
       }
 
       // Add a new row with userID from localStorage
@@ -401,7 +453,7 @@
         event.preventDefault();
 
         const userID = localStorage.getItem("userId");
-        console.log("userId: ",localStorage.getItem("userId"));
+        console.log("userId: ", localStorage.getItem("userId"));
         if (!userID) {
           alert("UserID not found. Please log in.");
           return;
@@ -414,14 +466,14 @@
         const links = document.getElementById("addLink").value;
 
         const data = {
-            table: "link",
-            data: {
-                category: category,
-                session:session,
-                owner: owner,
-                description: description,
-                links: links,
-            },
+          table: "link",
+          data: {
+            category: category,
+            session: session,
+            owner: owner,
+            description: description,
+            links: links,
+          },
         };
 
         // Log the constructed JSON to verify
@@ -432,25 +484,49 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             table: "link",
-            data: { category,session, owner, description, links, userID },
+            data: { category, session, owner, description, links, userID },
           }),
         });
 
         if (response.ok) {
           alert("Row added successfully!");
           loadTableData();
-          const modal = bootstrap.Modal.getInstance(document.getElementById("addModal"));
+          const modal = bootstrap.Modal.getInstance(
+            document.getElementById("addModal")
+          );
           modal.hide();
         } else {
           alert("Failed to add the row!");
         }
       }
 
+      // Attach update functionality to the button
+      function openUpdateModal(
+        id,
+        category,
+        session,
+        owner,
+        description,
+        links
+      ) {
+        document.getElementById("updateId").value = id;
+        document.getElementById("updateCategory").value = category;
+        document.getElementById("updateSession").value = session;
+        document.getElementById("updateOwner").value = owner;
+        document.getElementById("updateDescription").value = description;
+        document.getElementById("updateLink").value = links;
+
+        const modal = new bootstrap.Modal(
+          document.getElementById("updateModal")
+        );
+        modal.show();
+      }
+
       // Update a row with userID verification
       async function updateRow(event) {
         event.preventDefault();
 
-        const userID = localStorage.getItem("userID");
+        const userID = localStorage.getItem("userId"); // Fix variable name
         if (!userID) {
           alert("UserID not found. Please log in.");
           return;
@@ -463,28 +539,45 @@
         const description = document.getElementById("updateDescription").value;
         const links = document.getElementById("updateLink").value;
 
-        const response = await fetch("/update", {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            id,
-            data: { category, owner, description, links, userID },
-          }),
-        });
+        const data = {
+          table: "link",
+          id: id,
+          data: {
+            category: category,
+            session: session,
+            owner: owner,
+            description: description,
+            links: links,
+          },
+        };
 
-        if (response.ok) {
-          alert("Updated successfully!");
-          loadTableData();
-          const modal = bootstrap.Modal.getInstance(document.getElementById("updateModal"));
-          modal.hide();
-        } else {
-          alert("Failed to update the record!");
+        try {
+          const response = await fetch("/update?jsonStr", {
+            method: "POST", // Update to use POST for sending data
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+
+          if (response.ok) {
+            alert("Updated successfully!");
+            loadTableData();
+            const modal = bootstrap.Modal.getInstance(
+              document.getElementById("updateModal")
+            );
+            modal.hide();
+          } else {
+            const error = await response.json();
+            alert(`Failed to update the record: ${error.message}`);
+          }
+        } catch (error) {
+          console.error("Error updating record:", error);
+          alert("An error occurred while updating the record.");
         }
       }
 
       // Delete a row with userID verification
       async function deleteRow(id) {
-        const userID = localStorage.getItem("userID");
+        const userID = localStorage.getItem("userId"); // Fix variable name
         if (!userID) {
           alert("UserID not found. Please log in.");
           return;
@@ -492,27 +585,42 @@
 
         if (!confirm("Are you sure you want to delete this record?")) return;
 
-        const response = await fetch("/delete", {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id, userID }),
-        });
+        const data = {
+          table: "link",
+          id: id,
+          userID: userID,
+        };
 
-        if (response.ok) {
-          alert("Deleted successfully!");
-          loadTableData();
-        } else {
-          alert("Failed to delete the record!");
+        try {
+          const response = await fetch("/delete?jsonStr", {
+            method: "POST", // Use POST for sending data
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+
+          if (response.ok) {
+            alert("Deleted successfully!");
+            loadTableData();
+          } else {
+            const error = await response.json();
+            alert(`Failed to delete the record: ${error.message}`);
+          }
+        } catch (error) {
+          console.error("Error deleting record:", error);
+          alert("An error occurred while deleting the record.");
         }
       }
 
+
       // Attach event listeners and initialize data on page load
       document.getElementById("addForm").addEventListener("submit", addRow);
-      document.getElementById("updateForm").addEventListener("submit", updateRow);
+      document
+        .getElementById("updateForm")
+        .addEventListener("submit", updateRow);
       document.addEventListener("DOMContentLoaded", loadTableData);
       document.addEventListener("DOMContentLoaded", loadCategories);
       document.addEventListener("DOMContentLoaded", loadSessions);
-      </script>
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
