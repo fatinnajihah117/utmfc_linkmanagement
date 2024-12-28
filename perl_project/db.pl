@@ -75,7 +75,7 @@ get '/update' => sub ($c) {
     $c->render(json=>$result);
 };
 
-post '/update' => sub ($c) {
+post '/updateLink' => sub ($c) {
     my $jsonStr = $c->req->body;
 
     unless ($jsonStr) {

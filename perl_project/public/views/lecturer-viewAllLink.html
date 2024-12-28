@@ -364,7 +364,7 @@
 
           data.forEach((row, index) => {
             const tableRow = `
-              <tr data-id="${row.id}">
+              <tr data-id="${row.linkID}">
                 <td>${index + 1}</td>
                 <td>${row.category}</td>
                 <td>${row.datetime || "-"}</td>
@@ -373,14 +373,10 @@
                 <td>${row.description}</td>
                 <td><a href="${row.links}" target="_blank">${row.links}</a></td>
                 <td class="btn-action">
-                  <button class="btn-edit" onclick="openUpdateModal(${
-                    row.id
-                  }, '${row.category}', '${row.session}',  '${row.owner}', '${
-              row.description
-            }', '${row.links}')">
+                  <button class="btn-edit" onclick="openUpdateModal(${row.linkID}, '${row.category}', '${row.session}',  '${row.owner}', '${row.description}', '${row.links}')">
                     <i class="bi bi-pencil-square"></i>
                   </button>
-                  <button class="btn-delete" onclick="deleteRow(${row.id})">
+                  <button class="btn-delete" onclick="deleteRow(${row.linkID})">
                     <i class="bi bi-trash3"></i>
                   </button>
                 </td>
@@ -509,6 +505,8 @@
         description,
         links
       ) {
+
+        console.log(id);
         document.getElementById("updateId").value = id;
         document.getElementById("updateCategory").value = category;
         document.getElementById("updateSession").value = session;
@@ -551,8 +549,9 @@
           },
         };
 
+        console.log("updated JSON:", JSON.stringify(data));
         try {
-          const response = await fetch("/update?jsonStr", {
+          const response = await fetch("/updateLink?jsonStr", {
             method: "POST", // Update to use POST for sending data
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
