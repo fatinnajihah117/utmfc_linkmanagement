@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UTM Links</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f0ecec;
+      }
+      .navbar {
+        background-color: #fff;
+        border-bottom: 2px solid #900c3f;
+      }
+      .navbar-brand {
+        font-size: 24px;
+        font-weight: bold;
+        color: #900c3f;
+      }
+      .navbar-nav .nav-link {
+        color: #000;
+        font-weight: bold;
+        margin-right: 15px;
+      }
+      .navbar-nav .nav-link.active {
+        color: #900c3f;
+        border-bottom: 3px solid #900c3f;
+      }
+      .container-white {
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .btn-action {
+        display: flex;
+        gap: 10px;
+      }
+      .btn-edit,
+      .btn-delete {
+        border: none;
+        background: none;
+      }
+      .btn-edit i {
+        color: #007bff;
+        font-size: 20px;
+      }
+      .btn-delete i {
+        color: #dc3545;
+        font-size: 20px;
+      }
+      .btn-back {
+        font-size: 16px;
+        color: #900c3f;
+        background: none;
+        border: none;
+        padding: 12px 16px;
+      }
+      .btn-back i {
+        margin-right: 5px;
+        font-size: 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <img
+            alt="UTM Logo"
+            height="40"
+            src="..\images\UTM-LOGO-FULL.png"
+            style="width: auto"
+          />
+        </a>
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link active" href="dashboard.html">HOME</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="profile.html">PROFILE</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="..\loginPage.html">LOGOUT</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#"> UTM ROLE</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+      <div class="container-white">
+        <!-- Back Button and Title -->
+        <div class="d-flex align-items-center mb-3">
+          <button class="btn-back btn-lg">
+            <i class="bi bi-arrow-left" style="font-size: 1.5rem"></i>
+          </button>
+        </div>
+        <h2 class="ms-3 mb-0">All Personal Links</h2>
+        <!-- Filters and Search -->
+        <div class="d-flex justify-content-end align-items-center mb-3">
+          <div class="dropdown me-2">
+            <button
+              class="btn btn-primary dropdown-toggle"
+              type="button"
+              id="filterDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              Filters
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="#"
+                  data-filter="category"
+                  id="categoryFilter"
+                  >Category</a
+                >
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="#"
+                  data-filter="session"
+                  id="sessionFilter"
+                  >Session</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <input
+              type="text"
+              class="form-control"
+              id="searchInput"
+              placeholder="Search..."
+              style="max-width: 200px"
+            />
+          </div>
+        </div>
+        <!-- Table -->
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Category</th>
+              <th>Date/Time</th>
+              <th>Session</th>
+              <th>Owner</th>
+              <th>Description</th>
+              <th>Google Drive Links</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Data will be populated here -->
+          </tbody>
+        </table>
+        <!-- Footer -->
+        <div class="card-footer d-flex justify-content-end align-items-center">
+          <div>
+            <button class="btn btn-outline-secondary me-3">Share Link +</button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="openAddModal()"
+            >
+              Add
+            </button>
+          </div>
+          <nav>
+            <ul class="pagination mb-0">
+              <li class="page-item">
+                <a class="page-link" href="#">Previous</a>
+              </li>
+              <li class="page-item"><a class="page-link" href="#">1</a></li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item"><a class="page-link" href="#">Next</a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+    <!-- Add Modal -->
+    <div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add New Link</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="addForm">
+              <!--Category dan Session dalam bentuk dropdown-->
+              <div class="mb-3">
+                <label for="categoryInput" class="form-label">Category</label>
+                <input
+                  type="text"
+                  id="categoryInput"
+                  class="form-control"
+                  placeholder="Loading category..."
+                  readonly
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="sessionDropdown" class="form-label">Session</label>
+                <select id="sessionDropdown" class="form-select" required>
+                  <option value=""></option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="addOwner" class="form-label">Owner</label>
+                <input
+                  type="text"
+                  id="addOwner"
+                  class="form-control"
+                  required
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="addDescription" class="form-label"
+                  >Description</label
+                >
+                <input
+                  type="text"
+                  id="addDescription"
+                  class="form-control"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="addLink" class="form-label">Link</label>
+                <input type="url" id="addLink" class="form-control" required />
+              </div>
+              <button type="submit" class="btn btn-primary">Add</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Update Modal -->
+    <div
+      class="modal fade"
+      id="updateModal"
+      tabindex="-1"
+      aria-labelledby="updateModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="updateModalLabel">Update Link</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="updateForm">
+              <input type="hidden" id="updateId" />
+              <div class="mb-3">
+                <label for="updateCategory" class="form-label">Category</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="updateCategory"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="updateSession" class="form-label">Session</label>
+                <input type="text" class="form-control" id="updateSession" />
+              </div>
+              <div class="mb-3">
+                <label for="updateOwner" class="form-label">Owner</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="updateOwner"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="updateDescription" class="form-label"
+                  >Description</label
+                >
+                <textarea
+                  class="form-control"
+                  id="updateDescription"
+                  required
+                ></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="updateLink" class="form-label">Link</label>
+                <input
+                  type="url"
+                  class="form-control"
+                  id="updateLink"
+                  required
+                />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="updateRow(event)"
+            >
+              Save changes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--Add Script-->
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Get user role from localStorage
+        const userRole = localStorage.getItem("userRole") || "UTM LECTURER";
+        console.log(localStorage.getItem("userRole"));
+        console.log(userRole);
+
+        const params = new URLSearchParams(window.location.search);
+
+    // Retrieve the categoryName parameter
+        const categoryName = params.get("categoryName");
+
+        // If a category name exists, update the heading
+        if (categoryName) {
+          const heading = document.querySelector("h2.ms-3.mb-0");
+          heading.textContent = `${categoryName}`;
+        }
+
+        const categoryInput = document.getElementById("categoryInput");
+        if (categoryName) {
+          categoryInput.placeholder = categoryName;
+        } else {
+          categoryInput.placeholder = "Category not found";
+        }
+
+        // Update the UTM ROLE nav item with the user role
+        const roleNavItem = document.querySelector(
+          '.nav-item a.nav-link[href="#"]'
+        );
+        if (roleNavItem) {
+          roleNavItem.textContent = userRole;
+        }
+      });
+      function openAddModal() {
+        // Reset the form
+        document.getElementById("addForm").reset();
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById("addModal"));
+        modal.show();
+      }
+    </script>
+    <!--JSON SCRIPT! UBAH SINI-->
+    <script>
+      // Load the table data with userID from localStorage
+      async function loadTableData() {
+        try {
+          const urlParams = new URLSearchParams(window.location.search);
+          const categoryFilter = urlParams.get("categoryName");
+          console.log(categoryFilter);
+
+          const userID = localStorage.getItem("userId"); // Retrieve userID from localStorage
+          console.log("userID: ", localStorage.getItem("userId"));
+          if (!userID) {
+            alert("UserID not found. Please log in.");
+            return;
+          }
+
+          const jsonStr = JSON.stringify({
+            table: "link",
+            userID: userID, // Pass userID to the server
+          });
+          console.log(jsonStr);
+
+          const response = await fetch(
+            `/read?jsonStr=${encodeURIComponent(jsonStr)}`
+          );
+          const data = await response.json();
+
+          const tableBody = document.querySelector("table tbody");
+          tableBody.innerHTML = "";
+
+          const filteredData = categoryFilter? data.filter(row => row.category === categoryFilter): data;
+
+          filteredData.forEach((row, index) => {
+            const tableRow = `
+              <tr data-id="${row.linkID}">
+                <td>${index + 1}</td>
+                <td>${row.category}</td>
+                <td>${row.datetime || "-"}</td>
+                <td>${row.session}</td>
+                <td>${row.owner}</td>
+                <td>${row.description}</td>
+                <td><a href="${row.links}" target="_blank">${row.links}</a></td>
+                <td class="btn-action">
+                  <button class="btn-edit" onclick="openUpdateModal(${
+                    row.linkID
+                  }, '${row.category}', '${row.session}',  '${row.owner}', '${
+              row.description
+            }', '${row.links}')">
+                    <i class="bi bi-pencil-square"></i>
+                  </button>
+                  <button class="btn-delete" onclick="deleteRow(${row.linkID})">
+                    <i class="bi bi-trash3"></i>
+                  </button>
+                </td>
+              </tr>
+            `;
+            tableBody.insertAdjacentHTML("beforeend", tableRow);
+          });
+        } catch (error) {
+          console.error("Error loading data:", error);
+        }
+      }
+      
+      async function loadSessions() {
+        const url = `/read?jsonStr=${encodeURIComponent(
+          JSON.stringify({ table: "session" })
+        )}`;
+
+        fetch(url, {
+          method: "GET",
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Fetched sessions:", data.sessions);
+            if (data.sessions && data.sessions.length > 0) {
+              const sessionSelect = document.getElementById("sessionDropdown");
+              data.sessions.forEach((session) => {
+                const option = document.createElement("option");
+                option.value = session;
+                option.text = session;
+                sessionSelect.appendChild(option);
+              });
+            } else {
+              console.log("No session found");
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching session:", error);
+          });
+      }
+
+      // Add a new row with userID from localStorage
+      async function addRow(event) {
+        event.preventDefault();
+
+        const userID = localStorage.getItem("userId");
+        console.log("userId: ", localStorage.getItem("userId"));
+        if (!userID) {
+          alert("UserID not found. Please log in.");
+          return;
+        }
+        const urlParams = new URLSearchParams(window.location.search);
+        const categoryFilter = urlParams.get("categoryName");
+
+        const category = categoryFilter;
+        const session = document.getElementById("sessionDropdown").value;
+        const owner = document.getElementById("addOwner").value;
+        const description = document.getElementById("addDescription").value;
+        const links = document.getElementById("addLink").value;
+
+        const data = {
+          table: "link",
+          data: {
+            category: category,
+            session: session,
+            owner: owner,
+            description: description,
+            links: links,
+          },
+        };
+
+        // Log the constructed JSON to verify
+        console.log("Constructed JSON:", JSON.stringify(data));
+
+        const response = await fetch("/createLink?jsonStr", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            table: "link",
+            data: { category, session, owner, description, links, userID },
+          }),
+        });
+
+        if (response.ok) {
+          alert("Row added successfully!");
+          loadTableData();
+          const modal = bootstrap.Modal.getInstance(
+            document.getElementById("addModal")
+          );
+          modal.hide();
+        } else {
+          alert("Failed to add the row!");
+        }
+      }
+
+      // Attach update functionality to the button
+      function openUpdateModal(
+        id,
+        category,
+        session,
+        owner,
+        description,
+        links
+      ) {
+        console.log(id);
+        document.getElementById("updateId").value = id;
+        document.getElementById("updateCategory").value = category;
+        document.getElementById("updateSession").value = session;
+        document.getElementById("updateOwner").value = owner;
+        document.getElementById("updateDescription").value = description;
+        document.getElementById("updateLink").value = links;
+
+        const modal = new bootstrap.Modal(
+          document.getElementById("updateModal")
+        );
+        modal.show();
+      }
+
+      // Update a row with userID verification
+      async function updateRow(event) {
+        event.preventDefault();
+
+        const userID = localStorage.getItem("userId"); // Fix variable name
+        if (!userID) {
+          alert("UserID not found. Please log in.");
+          return;
+        }
+
+        const id = document.getElementById("updateId").value;
+        const category = document.getElementById("updateCategory").value;
+        const session = document.getElementById("updateSession").value;
+        const owner = document.getElementById("updateOwner").value;
+        const description = document.getElementById("updateDescription").value;
+        const links = document.getElementById("updateLink").value;
+
+        const data = {
+          table: "link",
+          id: id,
+          data: {
+            category: category,
+            session: session,
+            owner: owner,
+            description: description,
+            links: links,
+          },
+        };
+
+        console.log("updated JSON:", JSON.stringify(data));
+        try {
+          const response = await fetch("/updateLink?jsonStr", {
+            method: "POST", // Update to use POST for sending data
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+
+          if (response.ok) {
+            alert("Updated successfully!");
+            loadTableData();
+            const modal = bootstrap.Modal.getInstance(
+              document.getElementById("updateModal")
+            );
+            modal.hide();
+          } else {
+            const error = await response.json();
+            alert(`Failed to update the record: ${error.message}`);
+          }
+        } catch (error) {
+          console.error("Error updating record:", error);
+          alert("An error occurred while updating the record.");
+        }
+      }
+
+      // Delete a row with userID verification
+      async function deleteRow(id) {
+        const userID = localStorage.getItem("userId"); // Fix variable name
+        if (!userID) {
+          alert("UserID not found. Please log in.");
+          return;
+        }
+
+        if (!confirm("Are you sure you want to delete this record?")) return;
+
+        const data = {
+          table: "link",
+          id: id,
+          userID: userID,
+        };
+
+        try {
+          const response = await fetch("/delete?jsonStr", {
+            method: "POST", // Use POST for sending data
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+          });
+
+          if (response.ok) {
+            alert("Deleted successfully!");
+            loadTableData();
+          } else {
+            const error = await response.json();
+            alert(`Failed to delete the record: ${error.message}`);
+          }
+        } catch (error) {
+          console.error("Error deleting record:", error);
+          alert("An error occurred while deleting the record.");
+        }
+      }
+
+      //Search and Filter Function
+      document.addEventListener("DOMContentLoaded", () => {
+        const searchInput = document.getElementById("searchInput");
+        const filterDropdown = document.getElementById("filterDropdown");
+        const tableBody = document.querySelector("table tbody");
+
+        // Filter rows based on search query
+        searchInput.addEventListener("input", () => {
+          const query = searchInput.value.toLowerCase();
+          Array.from(tableBody.rows).forEach((row) => {
+            const cells = Array.from(row.cells);
+            const matches = cells.some((cell) =>
+              cell.textContent.toLowerCase().includes(query)
+            );
+            row.style.display = matches ? "" : "none";
+          });
+        });
+
+        // Filter rows based on category or session
+        document.querySelectorAll(".dropdown-item").forEach((item) => {
+          item.addEventListener("click", (e) => {
+            const filterType = e.target.getAttribute("data-filter");
+
+            // Prompt user to select a value for filtering
+            const value = prompt(
+              `Enter ${filterType} to filter:`
+            ).toLowerCase();
+
+            Array.from(tableBody.rows).forEach((row) => {
+              const cellIndex = filterType === "category" ? 1 : 3; // Category: 1, Session: 3
+              const cellText = row.cells[cellIndex].textContent.toLowerCase();
+              row.style.display = cellText.includes(value) ? "" : "none";
+            });
+          });
+        });
+      });
+
+      // Attach event listeners and initialize data on page load
+      document.getElementById("addForm").addEventListener("submit", addRow);
+      document
+        .getElementById("updateForm")
+        .addEventListener("submit", updateRow);
+      document.addEventListener("DOMContentLoaded", loadTableData);
+      document.addEventListener("DOMContentLoaded", loadSessions);
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

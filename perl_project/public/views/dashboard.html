@@ -105,7 +105,7 @@
         text-align: left;
         text-decoration: none;
         color: rgb(0, 0, 0);
-        background-color: #f9f9f9;
+        /*background-color: #f9f9f9;*/
       }
       .category-card:hover {
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -364,7 +364,7 @@
         const addCategoryBtn = document.getElementById("add-category-btn");
         const categoryModal = document.getElementById("categoryModal");
         const userRole = localStorage.getItem("userRole") || "UTM LECTURER";
-        console.log("userRole: ", userRole);
+        //console.log("userRole: ", userRole);
         console.log("userID: ", localStorage.getItem("userId"));
         loadCategories();
 
@@ -393,39 +393,76 @@
         });
 
         // Add category from modal
-        document.querySelectorAll(".list-group-item").forEach(function (item) {
-          item.addEventListener("click", function () {
-            const category = item.getAttribute("data-category");
-            const link = item.getAttribute("data-link");
+        // document.querySelectorAll(".list-group-item").forEach(function (item) {
+        //   item.addEventListener("click", function () {
+        //     const category = item.getAttribute("data-category");
+        //     const link = item.getAttribute("data-link");
 
-            // Create new category card
-            const newCard = document.createElement("div");
-            newCard.classList.add("position-relative", "col-3");
-            newCard.setAttribute("data-category", category);
-            newCard.innerHTML = `
-              <a href="${link}" class="category-card">${category}</a>
-              <div class="dropdown position-absolute" style="top: 10px; right: 15px;">
-                <button class="btn btn-light btn-sm dropdown-toggle p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="bi bi-three-dots-vertical"></i>
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item delete-category">Delete</a></li>
-                </ul>
-              </div>
-            `;
+        //     // Create new category card
+        //     const newCard = document.createElement("div");
+        //     newCard.classList.add("position-relative", "col-3");
+        //     newCard.setAttribute("data-category", category);
+        //     newCard.innerHTML = `
+        //       <a href="${link}" class="category-card">${category}</a>
+        //       <div class="dropdown position-absolute" style="top: 10px; right: 15px;">
+        //         <button class="btn btn-light btn-sm dropdown-toggle p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        //           <i class="bi bi-three-dots-vertical"></i>
+        //         </button>
+        //         <ul class="dropdown-menu">
+        //           <li><a class="dropdown-item delete-category">Delete</a></li>
+        //         </ul>
+        //       </div>
+        //     `;
 
-            // Add new card to container
-            categoryContainer.appendChild(newCard);
+        //     // Add new card to container
+        //     categoryContainer.appendChild(newCard);
 
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(
-              document.getElementById("categoryModal")
-            );
-            modal.hide();
+        //     // Close modal
+        //     const modal = bootstrap.Modal.getInstance(
+        //       document.getElementById("categoryModal")
+        //     );
+        //     modal.hide();
+        //   });
+        // });
+
+        function addCategoryCard(category, link) {
+          const categoryContainer = document.getElementById('category-container'); // Adjust to your actual container ID
+
+          // Create new category card
+          const newCard = document.createElement('div');
+          newCard.classList.add('position-relative', 'col-3');
+          newCard.setAttribute('data-category', category);
+          const linkWithQuery = `${link}?categoryName=${encodeURIComponent(category)}`;
+
+          const colors = ['#f2da99', '#abe38d', '#8dd5e3', '#caaaf2', '#f2aac7'];
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+          newCard.innerHTML = `
+            <a href="${linkWithQuery}" class="category-card" style="background-color: ${randomColor};">${category}</a>
+            <div class="dropdown position-absolute" style="top: 10px; right: 15px;">
+              <button class="btn btn-light btn-sm dropdown-toggle p-0" style="background-color: unset; border:none;"type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-three-dots-vertical"></i>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item delete-category">Delete</a></li>
+              </ul>
+            </div>
+          `;
+
+          // Add delete functionality to the card
+          newCard.querySelector('.delete-category').addEventListener('click', function () {
+            newCard.remove();
           });
-        });
-      });
-      async function loadCategories() {
+
+          // Add new card to the container
+          categoryContainer.appendChild(newCard);
+
+          // Close the modal
+          const modal = bootstrap.Modal.getInstance(document.getElementById('categoryModal'));
+          modal.hide();
+        }
+
+        async function loadCategories() {
         const url = `/read?jsonStr=${encodeURIComponent(
           JSON.stringify({ table: "category" })
         )}`;
@@ -442,7 +479,13 @@
                 const listItem = document.createElement("li");
                 listItem.className = "list-group-item";
                 listItem.dataset.category = categoryName; // Assuming category_name is the field name
+                listItem.dataset.link = `categoryLinks.html`; // Generate dynamic link
                 listItem.textContent = categoryName;
+
+                listItem.addEventListener('click', function () {
+                  addCategoryCard(categoryName, listItem.dataset.link);
+                });
+
                 categorySelect.appendChild(listItem);
               });
             } else {
@@ -453,6 +496,11 @@
             console.error("Error fetching categories:", error);
           });
       }
+
+
+
+      });
+      
     </script>
   </body>
 </html>
