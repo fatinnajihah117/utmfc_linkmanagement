@@ -66,15 +66,6 @@ post '/createLink' => sub ($c) {
     my $userID = $json->{data}->{userID};
     print "Received JSON: $jsonStr\n";  # Debugging: print the raw JSON string to check if it's being received properly
     print "Received userID: $userID\n";
-    #my $json;
-    #eval {
-    #    $json = decode_json($jsonStr);  # Decode the incoming JSON string
-    #};
-    #if ($@) {
-    #    print "Error parsing JSON: $@\n";  # Print any error if JSON is malformed
-    #    $c->render(json => { error => "Malformed JSON" });
-    #    return;
-    #}
     
     #$json->{data}->{userID} = $c->session(userID);
     print "Received userID in db.pl: " . $json->{'data'}->{'userID'} . "\n";
@@ -83,6 +74,19 @@ post '/createLink' => sub ($c) {
     #$c->render(text=>"create $jsonStr");
     print $result;
     $c->render(json=>$result);
+};
+
+post '/createGroup' => sub ($c) {
+    my $jsonStr = $c->req->body;  # Use the request body directly
+    my $json = decode_json($jsonStr);
+
+    print "Received JSON: $jsonStr\n";  # Debugging: log the JSON request
+
+    # Call createJSON function in CRUD.pl
+    my $result = CRUD::createJSON($dbh, $json);
+
+    # Return the result as JSON response
+    $c->render(json => $result);
 };
 
 ### http://localhost:3000/read?jsonStr={"table":"gdlinks"}

@@ -169,7 +169,7 @@ body {
       var password = $('#password').val();
 
       // Check if user exists in the local database
-      var checkUserUrl = `http://localhost:3000/check?jsonStr=${encodeURIComponent(JSON.stringify({ username: username, password: password }))}`;
+      var checkUserUrl = `http://localhost:3000/check?jsonStr=${encodeURIComponent(JSON.stringify({ username: username,password:password}))}`;
       console.log("Checking user in database:", checkUserUrl);
       
 
@@ -196,6 +196,9 @@ body {
 
                           // Store user data in localStorage
                           localStorage.setItem("userRole", userData.userData.role);
+                          localStorage.setItem("userEmail", userData.userData.email);
+                          localStorage.setItem("userMatric", userData.userData.username);
+                          localStorage.setItem("userName", userData.userData.full_name);
                           localStorage.setItem("userId", userData.userData.userID);
 
                           // Redirect to dashboard.html
@@ -222,7 +225,6 @@ body {
                                   table: "users",
                                   data: {
                                       username: userData.login_name,
-                                      password: password,
                                       email: userData.email,
                                       full_name: userData.full_name,
                                       role: userData.description,

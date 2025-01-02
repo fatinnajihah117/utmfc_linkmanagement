@@ -127,7 +127,7 @@ sub createJSON {
         
     } elsif ($table eq "users") {
         my $sth = $dbh->prepare(
-            'INSERT INTO users (username, password, email, full_name, role) VALUES (?, ?, ?, ?, ?)'
+            'INSERT INTO users (username, email, full_name, role) VALUES (?, ?, ?, ?, ?)'
         );
 
         unless ($sth) {
@@ -138,7 +138,7 @@ sub createJSON {
         }
 
         my $success = $sth->execute(
-            $data->{'username'}, $data->{'password'}, $data->{'email'},
+            $data->{'username'}, $data->{'email'},
             $data->{'full_name'}, $data->{'role'}
         );
 
@@ -153,6 +153,50 @@ sub createJSON {
             success   => 1,
             operation => "CREATE",
             inserted  => $data,
+        };
+    }elsif($table eq "groups"){
+        # Insert into groups table
+        my $sth = $dbh->prepare(
+            'INSERT INTO groups (group_name, description, owner, session) VALUES (?, ?, ?, ?)'
+        );
+
+        unless ($sth) {
+            return {
+                success => 0,
+                error   => "Prepare statement failed: " . $dbh->errstr,
+            };
+        }
+
+        my $success = $sth->execute(
+            $data->{'group_name'}, $data->{'description'}, $data->{'owner'},
+            $data->{'session'}
+        );
+
+        unless ($success) {
+            return {
+                success => 0,
+                error   => "Execution failed: " . $dbh->errstr,
+            };
+        }
+
+        # Get the last inserted groupID
+        my $sth_group = $dbh->prepare('SELECT LAST_INSERT_ID()');
+        $sth_group->execute();
+        my ($groupID) = $sth_group->fetchrow_array();
+
+        # Insert participants into user_group table
+        my $sth_user_group = $dbh->prepare(
+            'INSERT INTO user_group (userID, groupID) VALUES (?, ?)'
+        );
+
+        foreach my $userID (@{ $data->{'participants'} }) {
+            $sth_user_group->execute($userID, $groupID);
+        }
+
+        return {
+            success   => 1,
+            operation => "CREATE",
+            inserted  => { groupID => $groupID, %$data },
         };
     }
 
@@ -233,10 +277,10 @@ sub updateJSON {
         return $json;
     } elsif ($table eq "users") {
         my $sth = $dbh->prepare(
-            'UPDATE users SET username=?, password=?, email=?, full_name=?, role=? WHERE userID=?'
+            'UPDATE users SET username=?, email=?, full_name=?, role=? WHERE userID=?'
         ) or die 'prepare statement failed: ' . $dbh->errstr();
 
-        $sth->execute($data->{'username'}, $data->{'password'}, $data->{'email'}, 
+        $sth->execute($data->{'username'}, $data->{'email'}, 
                       $data->{'full_name'}, $data->{'role'}, $id) or die 'execution failed: ' . $dbh->errstr();
 
         $json->{'operation'} = "UPDATE";
@@ -289,18 +333,10 @@ sub checkJSON {
     my $json = shift(@_);
 
     my $username = $json->{'username'};
-    my $password = $json->{'password'};
-
-    unless ($username && $password) {
-        return {
-            success => 0,
-            error   => "Missing username or password",
-        };
-    }
-
+    #my $password = $json->{'password'};
     # Query the database for matching user credentials
-    my $sth = $dbh->prepare('SELECT * FROM users WHERE username = ? AND password = ?');
-    $sth->execute($username, $password) or die "Execution failed: " . $dbh->errstr;
+    my $sth = $dbh->prepare('SELECT * FROM users WHERE username = ?');
+    $sth->execute($username) or die "Execution failed: " . $dbh->errstr;
 
     my $result = $sth->fetchall_arrayref({});
 

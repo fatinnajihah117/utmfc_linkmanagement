@@ -124,6 +124,39 @@
       .dropdown-menu li a {
         cursor: pointer;
       }
+      .email-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+      }
+
+      .email-chip {
+        background-color: #e0e0e0;
+        padding: 5px 10px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .email-chip span {
+        font-size: 0.9rem;
+      }
+
+      .email-chip button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #777;
+        font-size: 1rem;
+      }
+
+      .email-input {
+        border: none;
+        outline: none;
+        flex: 1;
+        min-width: 120px;
+      }
     </style>
   </head>
   <body>
@@ -147,7 +180,7 @@
               <a class="nav-link" href="profile.html">PROFILE</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="..\loginPage.html">LOGOUT</a>
+              <a class="nav-link" id="logout" href="..\loginPage.html">LOGOUT</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#"> UTM ROLE</a>
@@ -279,7 +312,7 @@
       </div>
     </div>
     <!-- Create Group Modal -->
-    <div
+    <!-- <div
       class="modal fade"
       id="createGroupModal"
       tabindex="-1"
@@ -343,7 +376,8 @@
                   </button>
                 </div>
                 <div id="participantList" class="mt-2">
-                  <!-- Dynamically added participants will appear here -->
+                  Dynamically added participants will appear here 
+                
                 </div>
               </div>
             </form>
@@ -355,7 +389,85 @@
           </div>
         </div>
       </div>
+    </div>-->
+    <!-- Create Group Modal -->
+    <div
+    class="modal fade"
+    id="createGroupModal"
+    tabindex="-1"
+    aria-labelledby="createGroupModalLabel"
+    aria-hidden="true"
+    >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createGroupModalLabel">
+            Create Group Share Link
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <form id="createGroupForm">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label for="groupTitle" class="form-label">Group Title</label>
+              <input
+                type="text"
+                class="form-control"
+                id="groupTitle"
+                placeholder=""
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="sessionDropdown" class="form-label">Session</label>
+              <select id="sessionDropdown" class="form-select" required>
+                <option value=""></option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="groupDescription" class="form-label">
+                Description Group
+              </label>
+              <textarea
+                class="form-control"
+                id="groupDescription"
+                rows="3"
+                placeholder=""
+                required
+              ></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="participants" class="form-label">Participants</label>
+              <div
+                class="email-container border border-secondary p-2 rounded"
+                id="email-container"
+              >
+                <input
+                  type="text"
+                  class="email-input"
+                  id="email-input"
+                  placeholder="Enter email and press Enter"
+                />
+              </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger" >
+            Create
+          </button>
+        </div>
+      </form>
+      </div>
     </div>
+    </div>
+
+    <!-- Group Card Container -->
+    <div class="row" id="groupCardContainer"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -366,8 +478,12 @@
         const userRole = localStorage.getItem("userRole") || "UTM LECTURER";
         //console.log("userRole: ", userRole);
         console.log("userID: ", localStorage.getItem("userId"));
+        console.log("userEmail: ", localStorage.getItem("userEmail"));
         loadCategories();
-
+        loadCategoriesFromStorage();
+        loadSessions();
+        //createGroup();
+        
         // Update the UTM ROLE nav item with the user role
         const roleNavItem = document.querySelector(
           '.nav-item a.nav-link[href="#"]'
@@ -375,6 +491,14 @@
         if (roleNavItem) {
           roleNavItem.textContent = userRole;
         }
+
+        document.getElementById("logout").addEventListener("click", function () {
+          // Clear localStorage
+          localStorage.clear();
+
+          // Optionally, log out message for debugging
+          console.log("User logged out, localStorage cleared.");
+        });
 
         // Delete category
         categoryContainer.addEventListener("click", function (event) {
@@ -392,115 +516,329 @@
           modal.show();
         });
 
-        // Add category from modal
-        // document.querySelectorAll(".list-group-item").forEach(function (item) {
-        //   item.addEventListener("click", function () {
-        //     const category = item.getAttribute("data-category");
-        //     const link = item.getAttribute("data-link");
+        const listColors = ['#f2da99', '#abe38d', '#8dd5e3', '#caaaf2', '#f2aac7'];
+          const randomColor = listColors[Math.floor(Math.random() * listColors.length)];
 
-        //     // Create new category card
-        //     const newCard = document.createElement("div");
-        //     newCard.classList.add("position-relative", "col-3");
-        //     newCard.setAttribute("data-category", category);
-        //     newCard.innerHTML = `
-        //       <a href="${link}" class="category-card">${category}</a>
-        //       <div class="dropdown position-absolute" style="top: 10px; right: 15px;">
-        //         <button class="btn btn-light btn-sm dropdown-toggle p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        //           <i class="bi bi-three-dots-vertical"></i>
-        //         </button>
-        //         <ul class="dropdown-menu">
-        //           <li><a class="dropdown-item delete-category">Delete</a></li>
-        //         </ul>
-        //       </div>
-        //     `;
+          function addCategoryCard(category, link, color = null) {
+            const categoryContainer = document.getElementById('category-container');
 
-        //     // Add new card to container
-        //     categoryContainer.appendChild(newCard);
+            // Generate a random color if none is provided
+            const listColors = ['#f2da99', '#abe38d', '#8dd5e3', '#caaaf2', '#f2aac7'];
+            const cardColor = color || listColors[Math.floor(Math.random() * listColors.length)];
 
-        //     // Close modal
-        //     const modal = bootstrap.Modal.getInstance(
-        //       document.getElementById("categoryModal")
-        //     );
-        //     modal.hide();
-        //   });
-        // });
+            // Create new category card
+            const newCard = document.createElement('div');
+            newCard.classList.add('position-relative', 'col-3');
+            newCard.setAttribute('data-category', category);
+            const linkWithQuery = `${link}?categoryName=${encodeURIComponent(category)}`;
 
-        function addCategoryCard(category, link) {
-          const categoryContainer = document.getElementById('category-container'); // Adjust to your actual container ID
+            newCard.innerHTML = `
+              <a href="${linkWithQuery}" class="category-card" style="background-color: ${cardColor};">${category}</a>
+              <div class="dropdown position-absolute" style="top: 10px; right: 15px;">
+                <button class="btn btn-light btn-sm dropdown-toggle p-0" style="background-color: unset; border: none; " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu">
+                  <li><a class="dropdown-item delete-category">Delete</a></li>
+                </ul>
+              </div>
+            `;
 
-          // Create new category card
-          const newCard = document.createElement('div');
-          newCard.classList.add('position-relative', 'col-3');
-          newCard.setAttribute('data-category', category);
-          const linkWithQuery = `${link}?categoryName=${encodeURIComponent(category)}`;
+            // Add delete functionality to the card
+            newCard.querySelector('.delete-category').addEventListener('click', function () {
+              newCard.remove();
+              removeCategoryFromStorage(category);
+            });
 
-          const colors = ['#f2da99', '#abe38d', '#8dd5e3', '#caaaf2', '#f2aac7'];
-          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            // Add new card to the container
+            categoryContainer.appendChild(newCard);
 
-          newCard.innerHTML = `
-            <a href="${linkWithQuery}" class="category-card" style="background-color: ${randomColor};">${category}</a>
-            <div class="dropdown position-absolute" style="top: 10px; right: 15px;">
-              <button class="btn btn-light btn-sm dropdown-toggle p-0" style="background-color: unset; border:none;"type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-three-dots-vertical"></i>
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item delete-category">Delete</a></li>
-              </ul>
-            </div>
-          `;
+            // Save the category to sessionStorage if color is not provided (i.e., new card)
+            if (!color) {
+              saveCategoryToStorage(category, link, cardColor);
+            }
 
-          // Add delete functionality to the card
-          newCard.querySelector('.delete-category').addEventListener('click', function () {
-            newCard.remove();
-          });
-
-          // Add new card to the container
-          categoryContainer.appendChild(newCard);
-
-          // Close the modal
-          const modal = bootstrap.Modal.getInstance(document.getElementById('categoryModal'));
-          modal.hide();
-        }
+            // Close the modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('categoryModal'));
+            if (modal) modal.hide();
+          }
 
         async function loadCategories() {
-        const url = `/read?jsonStr=${encodeURIComponent(
-          JSON.stringify({ table: "category" })
-        )}`;
+          const url = `/read?jsonStr=${encodeURIComponent(
+            JSON.stringify({ table: "category" })
+          )}`;
 
-        fetch(url, {
-          method: "GET",
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            console.log("Fetched categories:", data.categories);
-            if (data.categories && data.categories.length > 0) {
-              const categorySelect = document.getElementById("category-list");
-              data.categories.forEach((categoryName) => {
-                const listItem = document.createElement("li");
-                listItem.className = "list-group-item";
-                listItem.dataset.category = categoryName; // Assuming category_name is the field name
-                listItem.dataset.link = `categoryLinks.html`; // Generate dynamic link
-                listItem.textContent = categoryName;
-
-                listItem.addEventListener('click', function () {
-                  addCategoryCard(categoryName, listItem.dataset.link);
-                });
-
-                categorySelect.appendChild(listItem);
-              });
-            } else {
-              console.log("No categories found");
-            }
+          fetch(url, {
+            method: "GET",
           })
-          .catch((error) => {
-            console.error("Error fetching categories:", error);
-          });
-      }
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("Fetched categories:", data.categories);
+              if (data.categories && data.categories.length > 0) {
+                const categorySelect = document.getElementById("category-list");
+                data.categories.forEach((categoryName) => {
+                  const listItem = document.createElement("li");
+                  listItem.className = "list-group-item";
+                  listItem.dataset.category = categoryName; // Assuming category_name is the field name
+                  listItem.dataset.link = `categoryLinks.html`; // Generate dynamic link
+                  listItem.textContent = categoryName;
 
+                  listItem.addEventListener('click', function () {
+                    addCategoryCard(categoryName, listItem.dataset.link);
+                  });
+
+                  categorySelect.appendChild(listItem);
+                });
+              } else {
+                console.log("No categories found");
+              }
+            })
+            .catch((error) => {
+              console.error("Error fetching categories:", error);
+            });
+        }
+        function saveCategoryToStorage(category, link, color) {
+          const categories = JSON.parse(sessionStorage.getItem('categories')) || [];
+          categories.push({ category, link, color });
+          sessionStorage.setItem('categories', JSON.stringify(categories));
+        }
+
+        function removeCategoryFromStorage(category) {
+          let categories = JSON.parse(sessionStorage.getItem('categories')) || [];
+          categories = categories.filter((item) => item.category !== category);
+          sessionStorage.setItem('categories', JSON.stringify(categories));
+        }
+
+        function loadCategoriesFromStorage() {
+          const categories = JSON.parse(sessionStorage.getItem('categories')) || [];
+          categories.forEach((item) => {
+            const { category, link, color } = item;
+            const categoryContainer = document.getElementById('category-container');
+            addCategoryCard(category, link, color); // Pass the color to addCategoryCard
+            
+          });
+        }
+
+        async function loadSessions() {
+          const url = `/read?jsonStr=${encodeURIComponent(
+            JSON.stringify({ table: "session" })
+          )}`;
+
+          fetch(url, {
+            method: "GET",
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("Fetched sessions:", data.sessions);
+              if (data.sessions && data.sessions.length > 0) {
+                const sessionSelect = document.getElementById("sessionDropdown");
+                data.sessions.forEach((session) => {
+                  const option = document.createElement("option");
+                  option.value = session;
+                  option.text = session;
+                  sessionSelect.appendChild(option);
+                });
+              } else {
+                console.log("No session found");
+              }
+            })
+            .catch((error) => {
+              console.error("Error fetching session:", error);
+            });
+        }
+
+        
+
+        // Validate email format
+        function validateEmail(email) {
+          const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          return regex.test(email);
+        }
+
+        // async function createGroup() {
+        //   const title = document.getElementById("groupTitle").value;
+        //   const description = document.getElementById("groupDescription").value;
+        //   const session = document.getElementById("sessionDropdown").value;
+
+        //   // Validate required fields
+        //   if (!title || !description || !session) {
+        //       alert("Please fill in all fields before creating a group.");
+        //       return;
+        //   }
+
+        //   if (emailList.length === 0) {
+        //       alert("Please add at least one participant.");
+        //       return;
+        //   }
+        //   const requestData = {
+        //     table: "groups",
+        //     data: {
+        //         group_name: title,
+        //         description: description,
+        //         owner: localStorage.getItem("userEmail"),
+        //         session: session,
+        //         participants: emailList, // Send the selected user IDs for insertion into user_group
+        //     },
+        //   };
+        //   console.log("Constructed group:", JSON.stringify(requestData));
+
+          // try {
+          //     // Prepare group data
+          //     const groupData = {
+          //         table: "groups",
+          //         data: {
+          //             group_name:title,
+          //             description:description,
+          //             session:session,
+          //             owner: localStorage.getItem("userId"),
+          //         },
+          //     };
+          //     console.log("Constructed group:", JSON.stringify(groupData));
+          //     // Save group to the database
+          //     const groupResponse = await fetch("/createGroup?jsonStr", {
+          //         method: "POST",
+          //         headers: {
+          //             "Content-Type": "application/json",
+          //         },
+          //         body: JSON.stringify({
+          //           table:"groups",
+          //           data: {group_name, description, session, owner}
+          //         }),
+          //     });
+
+          //     const groupResult = await groupResponse.json();
+          //     if (groupResult.success) {
+          //         const groupId = groupResult.insertedId;
+          //         console.log("groupID:",groupId);
+          //         // Prepare user-group relationship data
+          //         const userGroupData = emailList.map(email => ({
+          //             table: "user_group",
+          //             data: {
+          //                 groupID: groupId,
+          //                 userID: email,
+          //             },
+          //         }));
+
+          //         // Save participants to user_group table
+          //         const participantResponses = await Promise.all(
+          //             userGroupData.map(entry =>
+          //                 fetch("/insert", {
+          //                     method: "POST",
+          //                     headers: {
+          //                         "Content-Type": "application/json",
+          //                     },
+          //                     body: JSON.stringify(entry),
+          //                 })
+          //             )
+          //         );
+
+          //         const participantResults = await Promise.all(participantResponses.map(res => res.json()));
+
+          //         if (participantResults.every(res => res.success)) {
+          //             alert("Group created successfully!");
+          //             location.reload(); // Refresh to reflect new group
+          //         } else {
+          //             alert("Group created, but some participants could not be added.");
+          //         }
+          //     } else {
+          //         alert("Failed to create group. Please try again.");
+          //     }
+          // } catch (error) {
+          //     console.error("Error creating group:", error);
+          //     alert("An error occurred while creating the group.");
+          // }
+      //}
+
+        function addGroupCard(groupID, title, description, userEmail, session) {
+          const groupCard = document.createElement("div");
+          groupCard.className = "col-md-4";
+          groupCard.innerHTML = `
+            <a href="groupShareLink.html?groupID=${groupID}" class="group-card-link">
+              <div class="group-card">
+                <h5 class="group-card-title">${title}</h5>
+                <p class="group-card-subtitle">${description}</p>
+                <p>Owner: ${owner}</p>
+                <p>Session: ${session}</p>
+              </div>
+            </a>
+          `;
+          groupCardContainer.appendChild(groupCard);
+        }
 
 
       });
-      
+      //document.getElementById("createGroupForm").addEventListener("submit", createGroup);
+        const emailContainer = document.getElementById("email-container");
+        const emailInput = document.getElementById("email-input");
+        const emailList = [];
+        const groupCardContainer = document.getElementById("groupCardContainer");
+
+
+        // Add email to the list
+        emailInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && emailInput.value.trim() !== "") {
+            e.preventDefault();
+            if (!emailList.includes(emailInput.value.trim())) {
+              const email = emailInput.value.trim();
+              emailList.push(email);
+              const chip = document.createElement("div");
+              chip.className = "email-chip";
+              chip.innerHTML = `<span>${email}</span> <button onclick="removeEmail('${email}')">&times;</button>`;
+              emailContainer.insertBefore(chip, emailInput);
+              emailInput.value = "";
+            }
+          }
+        });
+
+        // Remove email from the list
+        function removeEmail(email) {
+          const index = emailList.indexOf(email);
+          if (index > -1) {
+            emailList.splice(index, 1);
+            renderEmails();
+          }
+        }
+
+        // Render emails
+        function renderEmails() {
+          emailContainer.innerHTML = "";
+          emailList.forEach((email) => {
+            const emailChip = document.createElement("div");
+            emailChip.className = "email-chip";
+            emailChip.innerHTML = `<span>${email}</span><button onclick="removeEmail('${email}')">&times;</button>`;
+            emailContainer.appendChild(emailChip);
+          });
+          emailContainer.appendChild(emailInput);
+        }
+       async function createGroup(event) {
+          event.preventDefault();
+          const title = document.getElementById("groupTitle").value;
+          const description = document.getElementById("groupDescription").value;
+          const session = document.getElementById("sessionDropdown").value;
+
+          // Validate required fields
+          if (!title || !description || !session) {
+              alert("Please fill in all fields before creating a group.");
+              return;
+          }
+
+          if (emailList.length === 0) {
+              alert("Please add at least one participant.");
+              return;
+          }
+          const requestData = {
+            table: "groups",
+            data: {
+                group_name: title,
+                description: description,
+                owner: localStorage.getItem("userEmail"),
+                session: session,
+                participants: emailList, // Send the selected user IDs for insertion into user_group
+            },
+          };
+          console.log("Constructed group:", JSON.stringify(requestData));
+          }
+          document.getElementById("createGroupForm").addEventListener("submit", createGroup);
     </script>
   </body>
 </html>

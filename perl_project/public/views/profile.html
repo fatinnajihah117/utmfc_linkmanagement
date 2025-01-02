@@ -102,7 +102,7 @@
               <a class="nav-link active" href="profile.html">PROFILE</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="..\loginPage.html">LOGOUT</a>
+              <a class="nav-link" id="logout" href="..\loginPage.html">LOGOUT</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#"> UTM ROLE</a>
@@ -163,17 +163,7 @@
               />
             </div>
           </div>
-          <div class="col-md-6">
-            <div class="mb-3">
-              <label class="form-label" for="sessionId">Session ID</label>
-              <input
-                class="form-control"
-                id="sessionId"
-                readonly
-                type="text"
-                value="242790026649166"
-              />
-            </div>
+          
           </div>
         </div>
       </div>
@@ -182,15 +172,50 @@
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         // Get user role from localStorage
-        const userRole = localStorage.getItem("userRole") || "UTM LECTURER";
-        console.log(localStorage.getItem("userRole"));
-        console.log(userRole);
+        const userRole = localStorage.getItem("userRole") || "UNDEFINED";
+        const userEmail = localStorage.getItem("userEmail");
+        const userName = localStorage.getItem("userName");
+        const userMatric = localStorage.getItem("userMatric");
+
+        console.log(userRole,userEmail,userName,userMatric);
         // Update the UTM ROLE nav item with the user role
         const roleNavItem = document.querySelector(
           '.nav-item a.nav-link[href="#"]'
         );
         if (roleNavItem) {
           roleNavItem.textContent = userRole;
+        }
+
+        document.getElementById("logout").addEventListener("click", function () {
+          // Clear localStorage
+          localStorage.clear();
+
+          // Optionally, log out message for debugging
+          console.log("User logged out, localStorage cleared.");
+        });
+
+        // Update input fields with user details
+        const fullNameInput = document.getElementById("fullName");
+        const matricNumberInput = document.getElementById("matricNumber");
+        const descriptionInput = document.getElementById("description");
+
+        if (fullNameInput) {
+          fullNameInput.value = userName;
+        }
+        if (matricNumberInput) {
+          matricNumberInput.value = userMatric;
+        }
+        if (descriptionInput) {
+          descriptionInput.value = `Role: ${userRole}`;
+        }
+
+        // Update profile info display
+        const profileInfo = document.querySelector(".profile-info .ms-3");
+        if (profileInfo) {
+          profileInfo.innerHTML = `
+            <h5>${userName}</h5>
+            <p>${userEmail}</p>
+          `;
         }
       });
       const profilePictureContainer = document.getElementById(
