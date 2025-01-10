@@ -58,31 +58,7 @@
         font-size: 14px;
         margin-bottom: 10px;
       }
-      .participant-badge {
-        display: inline-block;
-        background-color: #e0e0e0;
-        border-radius: 50%;
-        width: 30px;
-        height: 30px;
-        line-height: 30px;
-        text-align: center;
-        margin: 2px;
-      }
-      .participant-red {
-        background-color: #f28b82; /* Light Red */
-      }
-      .participant-yellow {
-        background-color: #fbbc04; /* Light Yellow */
-      }
-      .participant-green {
-        background-color: #ccff90; /* Light Green */
-      }
-      .participant-teal {
-        background-color: #a7ffeb; /* Light Teal */
-      }
-      .participant-purple {
-        background-color: #d7aefb; /* Light Purple */
-      }
+
       .section-box {
         border: 1px solid #ddd;
         border-radius: 10px;
@@ -226,62 +202,9 @@
           Create Group +
         </button>
       </div>
-      <div class="row">
-        <div class="col-md-4">
-          <a href="groupShareLink.html" class="group-card-link">
-            <div class="group-card">
-              <h5 class="group-card-title">
-                SECR3104-3 APPLICATION DEVELOPMENT
-              </h5>
-              <p class="group-card-subtitle">
-                Course files submission for AD Course Section 03
-              </p>
-              <div>
-                <!-- Participants -->
-                <div class="participant-badge participant-red">EK</div>
-                <div class="participant-badge participant-yellow">JK</div>
-                <div class="participant-badge participant-green">AH</div>
-                <div class="participant-badge participant-teal">RT</div>
-                <div class="participant-badge participant-purple">+5</div>
-              </div>
-            </div>
-          </a>
-        </div>
-        <div class="col-md-4">
-          <div class="group-card">
-            <h5 class="group-card-title">SECR3104-4 APPLICATION DEVELOPMENT</h5>
-            <p class="group-card-subtitle">
-              Course files submission for AD Course Section 04
-            </p>
-            <div>
-              <!-- Participants -->
-              <div class="participant-badge participant-red">EK</div>
-              <div class="participant-badge participant-yellow">JK</div>
-              <div class="participant-badge participant-green">AH</div>
-              <div class="participant-badge participant-teal">RT</div>
-              <div class="participant-badge participant-purple">+2</div>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-4">
-          <div class="group-card">
-            <h5 class="group-card-title">
-              SECR3104-4 SOFTWARE DESIGN ARCHITECTURE
-            </h5>
-            <p class="group-card-subtitle">
-              Course files submission for SDA Course Section 04
-            </p>
-            <div>
-              <!-- Participants -->
-              <div class="participant-badge participant-red">EK</div>
-              <div class="participant-badge participant-yellow">JK</div>
-              <div class="participant-badge participant-green">AH</div>
-              <div class="participant-badge participant-teal">RT</div>
-              <div class="participant-badge participant-purple">+9</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div class="row" id="groupCardContainer">
+
+      </div> 
     </div>
 
     <!-- Add Category Modal -->
@@ -296,12 +219,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="categoryModalLabel">Add Category</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
+            <button type="button"class="btn-close"data-bs-dismiss="modal"aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <ul class="list-group" id="category-list">
@@ -312,116 +230,20 @@
       </div>
     </div>
     <!-- Create Group Modal -->
-    <!-- <div
-      class="modal fade"
-      id="createGroupModal"
-      tabindex="-1"
-      aria-labelledby="createGroupModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="createGroupModalLabel">
-              Create Group Share Link
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <form id="createGroupForm">
-              <div class="mb-3">
-                <label for="groupTitle" class="form-label">Group Title</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="groupTitle"
-                  placeholder=""
-                  required
-                />
-              </div>
-              <div class="mb-3">
-                <label for="groupDescription" class="form-label">
-                  Description Group
-                </label>
-                <textarea
-                  class="form-control"
-                  id="groupDescription"
-                  rows="3"
-                  placeholder=""
-                  required
-                ></textarea>
-              </div>
-              <div class="mb-3">
-                <label for="participants" class="form-label"
-                  >Participants</label
-                >
-                <div class="input-group">
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="participants"
-                    placeholder=""
-                  />
-                  <button
-                    class="btn btn-outline-secondary"
-                    type="button"
-                    id="addParticipantBtn"
-                  >
-                    Add
-                  </button>
-                </div>
-                <div id="participantList" class="mt-2">
-                  Dynamically added participants will appear here 
-                
-                </div>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-danger" form="createGroupForm">
-              Create
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>-->
-    <!-- Create Group Modal -->
-    <div
-    class="modal fade"
-    id="createGroupModal"
-    tabindex="-1"
-    aria-labelledby="createGroupModalLabel"
-    aria-hidden="true"
-    >
+    <div class="modal fade"id="createGroupModal"tabindex="-1"aria-labelledby="createGroupModalLabel"aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="createGroupModalLabel">
             Create Group Share Link
           </h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
+          <button type="button"class="btn-close"data-bs-dismiss="modal"aria-label="Close"></button>
         </div>
         <form id="createGroupForm">
           <div class="modal-body">
             <div class="mb-3">
               <label for="groupTitle" class="form-label">Group Title</label>
-              <input
-                type="text"
-                class="form-control"
-                id="groupTitle"
-                placeholder=""
-                required
-              />
+              <input type="text"class="form-control"id="groupTitle"placeholder=""required/>
             </div>
             <div class="mb-3">
               <label for="sessionDropdown" class="form-label">Session</label>
@@ -433,13 +255,7 @@
               <label for="groupDescription" class="form-label">
                 Description Group
               </label>
-              <textarea
-                class="form-control"
-                id="groupDescription"
-                rows="3"
-                placeholder=""
-                required
-              ></textarea>
+              <textarea class="form-control"id="groupDescription"rows="3"placeholder=""required></textarea>
             </div>
             <div class="mb-3">
               <label for="participants" class="form-label">Participants</label>
@@ -447,12 +263,7 @@
                 class="email-container border border-secondary p-2 rounded"
                 id="email-container"
               >
-                <input
-                  type="text"
-                  class="email-input"
-                  id="email-input"
-                  placeholder="Enter email and press Enter"
-                />
+                <input type="text"class="email-input"id="email-input"placeholder="Enter email and press Enter"/>
               </div>
             </div>
         </div>
@@ -465,9 +276,6 @@
       </div>
     </div>
     </div>
-
-    <!-- Group Card Container -->
-    <div class="row" id="groupCardContainer"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -482,6 +290,7 @@
         loadCategories();
         loadCategoriesFromStorage();
         loadSessions();
+        loadUserGroups(localStorage.getItem("userEmail"));
         //createGroup();
         
         // Update the UTM ROLE nav item with the user role
@@ -515,9 +324,6 @@
           );
           modal.show();
         });
-
-        const listColors = ['#f2da99', '#abe38d', '#8dd5e3', '#caaaf2', '#f2aac7'];
-          const randomColor = listColors[Math.floor(Math.random() * listColors.length)];
 
           function addCategoryCard(category, link, color = null) {
             const categoryContainer = document.getElementById('category-container');
@@ -647,6 +453,26 @@
             });
         }
 
+        function loadUserGroups(userEmail) {
+          fetch('/getUserGroups?jsonStr=' + encodeURIComponent(JSON.stringify({ userEmail: userEmail })))
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Groups fetched successfully:', data);
+                // Process and display the data
+                data.forEach(group => {
+                  addGroupCard(group.groupID, group.group_name, group.description, group.owner, group.session);
+                });
+            })
+            .catch(error => {
+                console.error('Failed to fetch user groups:', error);
+            });
+        }
+
         
 
         // Validate email format
@@ -655,105 +481,11 @@
           return regex.test(email);
         }
 
-        // async function createGroup() {
-        //   const title = document.getElementById("groupTitle").value;
-        //   const description = document.getElementById("groupDescription").value;
-        //   const session = document.getElementById("sessionDropdown").value;
-
-        //   // Validate required fields
-        //   if (!title || !description || !session) {
-        //       alert("Please fill in all fields before creating a group.");
-        //       return;
-        //   }
-
-        //   if (emailList.length === 0) {
-        //       alert("Please add at least one participant.");
-        //       return;
-        //   }
-        //   const requestData = {
-        //     table: "groups",
-        //     data: {
-        //         group_name: title,
-        //         description: description,
-        //         owner: localStorage.getItem("userEmail"),
-        //         session: session,
-        //         participants: emailList, // Send the selected user IDs for insertion into user_group
-        //     },
-        //   };
-        //   console.log("Constructed group:", JSON.stringify(requestData));
-
-          // try {
-          //     // Prepare group data
-          //     const groupData = {
-          //         table: "groups",
-          //         data: {
-          //             group_name:title,
-          //             description:description,
-          //             session:session,
-          //             owner: localStorage.getItem("userId"),
-          //         },
-          //     };
-          //     console.log("Constructed group:", JSON.stringify(groupData));
-          //     // Save group to the database
-          //     const groupResponse = await fetch("/createGroup?jsonStr", {
-          //         method: "POST",
-          //         headers: {
-          //             "Content-Type": "application/json",
-          //         },
-          //         body: JSON.stringify({
-          //           table:"groups",
-          //           data: {group_name, description, session, owner}
-          //         }),
-          //     });
-
-          //     const groupResult = await groupResponse.json();
-          //     if (groupResult.success) {
-          //         const groupId = groupResult.insertedId;
-          //         console.log("groupID:",groupId);
-          //         // Prepare user-group relationship data
-          //         const userGroupData = emailList.map(email => ({
-          //             table: "user_group",
-          //             data: {
-          //                 groupID: groupId,
-          //                 userID: email,
-          //             },
-          //         }));
-
-          //         // Save participants to user_group table
-          //         const participantResponses = await Promise.all(
-          //             userGroupData.map(entry =>
-          //                 fetch("/insert", {
-          //                     method: "POST",
-          //                     headers: {
-          //                         "Content-Type": "application/json",
-          //                     },
-          //                     body: JSON.stringify(entry),
-          //                 })
-          //             )
-          //         );
-
-          //         const participantResults = await Promise.all(participantResponses.map(res => res.json()));
-
-          //         if (participantResults.every(res => res.success)) {
-          //             alert("Group created successfully!");
-          //             location.reload(); // Refresh to reflect new group
-          //         } else {
-          //             alert("Group created, but some participants could not be added.");
-          //         }
-          //     } else {
-          //         alert("Failed to create group. Please try again.");
-          //     }
-          // } catch (error) {
-          //     console.error("Error creating group:", error);
-          //     alert("An error occurred while creating the group.");
-          // }
-      //}
-
-        function addGroupCard(groupID, title, description, userEmail, session) {
+        function addGroupCard(groupID, title, description, owner, session) {
           const groupCard = document.createElement("div");
           groupCard.className = "col-md-4";
           groupCard.innerHTML = `
-            <a href="groupShareLink.html?groupID=${groupID}" class="group-card-link">
+            <a href="groupShareLink.html?groupID=${groupID}&session=${session}&owner=${owner}" class="group-card-link">
               <div class="group-card">
                 <h5 class="group-card-title">${title}</h5>
                 <p class="group-card-subtitle">${description}</p>
@@ -762,11 +494,12 @@
               </div>
             </a>
           `;
-          groupCardContainer.appendChild(groupCard);
+          document.getElementById('groupCardContainer').appendChild(groupCard);
         }
 
 
       });
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       //document.getElementById("createGroupForm").addEventListener("submit", createGroup);
         const emailContainer = document.getElementById("email-container");
         const emailInput = document.getElementById("email-input");
@@ -810,11 +543,14 @@
           });
           emailContainer.appendChild(emailInput);
         }
-       async function createGroup(event) {
+        async function createGroup(event) {
           event.preventDefault();
+          
           const title = document.getElementById("groupTitle").value;
           const description = document.getElementById("groupDescription").value;
           const session = document.getElementById("sessionDropdown").value;
+          const owner = localStorage.getItem("userEmail");
+          const participants = emailList;  // Assume emailList holds the user IDs or emails
 
           // Validate required fields
           if (!title || !description || !session) {
@@ -822,22 +558,48 @@
               return;
           }
 
-          if (emailList.length === 0) {
+          if (participants.length === 0) {
               alert("Please add at least one participant.");
               return;
           }
+
+          // Prepare the JSON payload
           const requestData = {
-            table: "groups",
-            data: {
-                group_name: title,
-                description: description,
-                owner: localStorage.getItem("userEmail"),
-                session: session,
-                participants: emailList, // Send the selected user IDs for insertion into user_group
-            },
+              table: "groups",
+              data: {
+                  group_name: title,
+                  description: description,
+                  owner: owner,
+                  session: session,
+                  participants: participants  // Include participants directly in the request
+              }
           };
+
           console.log("Constructed group:", JSON.stringify(requestData));
+
+          try {
+              // Send the POST request to the backend
+              const response = await fetch("/createGroup?jsonStr", {
+                  method: "POST",
+                  headers: {
+                      "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(requestData)
+              });
+
+              const result = await response.json();
+
+              if (result.success) {
+                  alert("Group created successfully!");
+                  location.reload();  // Refresh to reflect the new group
+              } else {
+                  alert(`Failed to create group: ${result.error}`);
+              }
+          } catch (error) {
+              console.error("Error creating group:", error);
+              alert("An unexpected error occurred.");
           }
+      }
           document.getElementById("createGroupForm").addEventListener("submit", createGroup);
     </script>
   </body>

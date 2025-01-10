@@ -89,13 +89,22 @@ post '/createGroup' => sub ($c) {
     $c->render(json => $result);
 };
 
+get '/getUserGroups' => sub ($c) {
+    my $json_str = $c->param('jsonStr');
+    my $json = decode_json($json_str);
+    my $userEmail = $json->{'userEmail'};
+    my $groups = CRUD::checkGroupsJSON($dbh, $userEmail);
+
+    $c->render(json => $groups);
+};
+
 ### http://localhost:3000/read?jsonStr={"table":"gdlinks"}
 get '/read' => sub ($c) {
     my $jsonStr = $c->param('jsonStr');
 
     my $json = decode_json($jsonStr);
     #my $userID = $c->session('userID');
-    print "Received userID in read: ".$json->{'userID'}."\n";
+    
      
     my $result = CRUD::readJSON($dbh, $json);##it will call the readJSON from CRUD.pl
     $c->render(json=>$result);
@@ -169,11 +178,24 @@ post '/delete' => sub ($c) {
     if ($@) {
         return $c->render(json => { success => 0, error => 'Invalid JSON format' }, status => 400);
     }
-
-    unless ($json->{table} && $json->{id}) {
-        return $c->render(json => { success => 0, error => 'Missing table or ID' }, status => 400);
+    
+    my $table = $json->{table};
+    
+    # Check which table is being targeted
+    if ($table eq 'link' || $table eq 'link_group') {
+        unless ($json->{id}) {
+            return $c->render(json => { success => 0, error => 'Missing link ID' }, status => 400);
+        }
     }
-
+    elsif ($table eq 'user_group') {
+        unless ($json->{userID} && $json->{groupID}) {
+            return $c->render(json => { success => 0, error => 'Missing userID or groupID' }, status => 400);
+        }
+    } else {
+        return $c->render(json => { success => 0, error => 'Unsupported table' }, status => 400);
+    }
+    
+    print "Received email: ".$json->{'email'}."\n";
     my $result = CRUD::deleteJSON($dbh, $json);
     $c->render(json => $result);
 };
