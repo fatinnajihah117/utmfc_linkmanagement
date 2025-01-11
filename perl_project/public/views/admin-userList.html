@@ -3,9 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lecturers List Page</title>
+    <title>UTM Links</title>
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
       rel="stylesheet"
     />
     <style>
@@ -16,20 +20,54 @@
         background-color: #fff;
         border-bottom: 2px solid #900c3f;
       }
-      .navbar-brand img {
-        height: 40px;
+      .navbar-brand {
+        font-size: 24px;
+        font-weight: bold;
+        color: #900c3f;
       }
       .navbar-nav .nav-link {
         color: #000;
         font-weight: bold;
         margin-right: 15px;
       }
-
       .navbar-nav .nav-link.active {
         color: #900c3f;
         border-bottom: 3px solid #900c3f;
       }
-
+      .container-white {
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .btn-action {
+        display: flex;
+        gap: 10px;
+      }
+      .btn-edit,
+      .btn-delete {
+        border: none;
+        background: none;
+      }
+      .btn-edit i {
+        color: #007bff;
+        font-size: 20px;
+      }
+      .btn-delete i {
+        color: #dc3545;
+        font-size: 20px;
+      }
+      .btn-back {
+        font-size: 16px;
+        color: #900c3f;
+        background: none;
+        border: none;
+        padding: 12px 16px;
+      }
+      .btn-back i {
+        margin-right: 5px;
+        font-size: 24px;
+      }
       .content-container {
         background-color: #fff;
         border-radius: 15px;
@@ -114,7 +152,7 @@
           <img
             alt="UTM Logo"
             height="40"
-            src="C:\Users\budak\OneDrive\Desktop\AD PROJECT\GDLinks\images\UTM-LOGO-FULL.png"
+            src="..\images\UTM-LOGO-FULL.png"
             style="width: auto"
           />
         </a>
@@ -124,52 +162,28 @@
               <a class="nav-link active" href="admin-dashboard.html">HOME</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="admin-feedback.html">FEEDBACK</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="loginPage.html">LOGOUT</a>
+              <a class="nav-link" href="..\loginPage.html">LOGOUT</a>
             </li>
           </ul>
         </div>
       </div>
     </nav>
+
     <!-- Main Content -->
     <div class="container">
       <div class="content-container">
-        <h2 class="mt-4">
-          Lecturer <span class="text-muted" id="lecturer-count"></span>
-        </h2>
+        <!-- Back Button and Title -->
+        <div class="d-flex align-items-center mb-3">
+          <button class="btn-back btn-lg">
+            <a href="admin-dashboard.html" class="btn-back btn-lg">
+              <i class="bi bi-arrow-left" style="font-size: 1.5rem"></i>
+            </a>
+          </button>
+        </div>
+        <h2 class="mt-4">USER LIST</h2>
         <div class="table-container">
           <!-- Filter and Search Bar -->
           <div class="filters">
-            <div class="dropdown">
-              <button
-                class="btn btn-outline-secondary btn-sm dropdown-toggle"
-                type="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Filters
-              </button>
-              <ul class="dropdown-menu">
-                <li>
-                  <a
-                    class="dropdown-item"
-                    href="#"
-                    onclick="sortTable('oldest')"
-                    >Oldest</a
-                  >
-                </li>
-                <li>
-                  <a
-                    class="dropdown-item"
-                    href="#"
-                    onclick="sortTable('newest')"
-                    >Newest</a
-                  >
-                </li>
-              </ul>
-            </div>
             <input
               type="text"
               class="form-control form-control-sm w-25"
@@ -179,17 +193,17 @@
             />
           </div>
 
-          <table class="table" id="lecturer-table">
+          <table class="table">
             <thead>
               <tr>
                 <th>#</th>
                 <th>Login Name</th>
                 <th>Full Name</th>
-                <th>Description</th>
-                <th>Session ID</th>
+                <th>Email</th>
+                <th>Role</th>
               </tr>
             </thead>
-            <tbody id="lecturer-list">
+            <tbody>
               <!-- Dynamically populated rows -->
             </tbody>
           </table>
@@ -198,63 +212,78 @@
       </div>
     </div>
 
+    <!--Add Script-->
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        fetchLecturers();
+      document.addEventListener("DOMContentLoaded", () => {
+        // Retrieve the role from the URL
+        const params = new URLSearchParams(window.location.search);
+        const role = params.get("role");
+
+        // Update the table heading dynamically
+        const heading = document.querySelector("h2.mt-4");
+        if (role) {
+          heading.textContent = `${role.toUpperCase()}`;
+        } else {
+          heading.textContent = "USER LIST";
+        }
+
+        const roleInput = document.getElementById("roleInput");
+        if (role) {
+          roleInput.placeholder = role;
+        } else {
+          roleInput.placeholder = "Role not found";
+        }
       });
 
-      function fetchLecturers() {
-        const lecturers = [
-          {
-            id: 1,
-            loginName: "foo",
-            fullName: "FOO FULL NAME",
-            description: "Web Service Client",
-            sessionId: "753588468826641",
-          },
-          {
-            id: 2,
-            loginName: "Course Coordination",
-            fullName: "FOO FULL NAME",
-            description: "Web Service Client",
-            sessionId: "753588468826642",
-          },
-          {
-            id: 3,
-            loginName: "Workshop",
-            fullName: "FOO FULL NAME BIN RAMLI",
-            description: "Web Service Client",
-            sessionId: "753588468826643",
-          },
-        ];
+      async function loadTableData() {
+        try {
+          // Retrieve the role filter from URL parameters
+          const urlParams = new URLSearchParams(window.location.search);
+          const roleFilter = urlParams.get("role"); // E.g., "Pensyarah", "Staff", "Pelajar"
+          console.log(roleFilter);
 
-        const tableBody = document.getElementById("lecturer-list");
-        lecturers.forEach((lecturer) => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-                <td>${lecturer.id}</td>
-                <td>${lecturer.loginName}</td>
-                <td>${lecturer.fullName}</td>
-                <td>${lecturer.description}</td>
-                <td>${lecturer.sessionId}</td>
-            `;
-          tableBody.appendChild(row);
-        });
+          const jsonStr = JSON.stringify({
+            table: "users",
+          });
+          console.log(jsonStr);
 
-        updateLecturerCount();
+          const response = await fetch(
+            `/getrole?jsonStr=${encodeURIComponent(jsonStr)}`
+          );
+          const data = await response.json();
+
+          // Select the table body element
+          const tableBody = document.querySelector("table tbody");
+          tableBody.innerHTML = ""; // Clear any existing rows
+
+          const filteredData = roleFilter
+            ? data.filter((user) => user.role === roleFilter)
+            : data;
+
+          // Populate the table with filtered data
+          filteredData.forEach((user, index) => {
+            const tableRow = `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${user.username}</td>
+          <td>${user.full_name}</td>
+          <td>${user.email}</td>
+          <td>${user.role}</td>
+        </tr>
+      `;
+            tableBody.insertAdjacentHTML("beforeend", tableRow);
+          });
+        } catch (error) {
+          console.error("Error loading table data:", error);
+        }
       }
 
-      function updateLecturerCount() {
-        const table = document
-          .getElementById("lecturer-table")
-          .querySelector("tbody");
-        const count = table.rows.length;
-        document.getElementById("lecturer-count").textContent = `(${count})`;
-      }
+      // Trigger table loading when the page is ready
+      document.addEventListener("DOMContentLoaded", loadTableData);
 
       function searchTable() {
         const input = document.getElementById("search-bar").value.toLowerCase();
-        const rows = document.querySelectorAll("#lecturer-table tbody tr");
+        const rows = document.querySelectorAll("table tbody tr");
         let found = false;
 
         rows.forEach((row) => {
@@ -268,18 +297,7 @@
 
         document.getElementById("no-results").classList.toggle("d-none", found);
       }
-      function sortTable(order) {
-        const table = document.getElementById("lecturer-table");
-        const rows = Array.from(table.querySelector("tbody").rows);
-        rows.sort((a, b) => {
-          const idA = parseInt(a.cells[4].textContent);
-          const idB = parseInt(b.cells[4].textContent);
-          return order === "oldest" ? idA - idB : idB - idA;
-        });
-        rows.forEach((row) => table.querySelector("tbody").appendChild(row));
-      }
     </script>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>
