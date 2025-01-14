@@ -72,6 +72,23 @@
       }
       #category-container .col-md-4 {
         margin-bottom: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .card {
+          width: calc(33.333% - 200px); /* Adjust width as needed */
+          min-width: 200px;
+          margin:6px;
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-body {
+          padding: 20px;
+          text-align: center;
       }
       .category-card {
         display: block;
@@ -176,9 +193,7 @@
           <div class="row" id="category-container">
             <!-- Category cards will be appended here -->
           </div>
-          <button class="btn-add" id="add-category-btn">
-            <i class="bi bi-plus-circle"></i>
-          </button>
+          
         </div>
 
         <!-- Session Section -->
@@ -205,29 +220,6 @@
       <div class="row" id="groupCardContainer">
 
       </div> 
-    </div>
-
-    <!-- Add Category Modal -->
-    <div
-      class="modal fade"
-      id="categoryModal"
-      tabindex="-1"
-      aria-labelledby="categoryModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="categoryModalLabel">Add Category</h5>
-            <button type="button"class="btn-close"data-bs-dismiss="modal"aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <ul class="list-group" id="category-list">
-              <!-- Categories will be dynamically inserted here -->
-            </ul>
-          </div>
-        </div>
-      </div>
     </div>
     <!-- Create Group Modal -->
     <div class="modal fade"id="createGroupModal"tabindex="-1"aria-labelledby="createGroupModalLabel"aria-hidden="true">
@@ -287,10 +279,11 @@
         //console.log("userRole: ", userRole);
         console.log("userID: ", localStorage.getItem("userId"));
         console.log("userEmail: ", localStorage.getItem("userEmail"));
-        loadCategories();
-        loadCategoriesFromStorage();
+        //loadCategories();
+        //loadCategoriesFromStorage();
         loadSessions();
         loadUserGroups(localStorage.getItem("userEmail"));
+        loadUserCategories(localStorage.getItem("userEmail"));
         //createGroup();
         
         // Update the UTM ROLE nav item with the user role
@@ -325,84 +318,77 @@
           modal.show();
         });
 
-          function addCategoryCard(category, link, color = null) {
+          function addCategoryCard(category) {
+            console.log("category each card:",category)
             const categoryContainer = document.getElementById('category-container');
 
             // Generate a random color if none is provided
             const listColors = ['#f2da99', '#abe38d', '#8dd5e3', '#caaaf2', '#f2aac7'];
-            const cardColor = color || listColors[Math.floor(Math.random() * listColors.length)];
+            const cardColor = listColors[Math.floor(Math.random() * listColors.length)];
 
             // Create new category card
             const newCard = document.createElement('div');
-            newCard.classList.add('position-relative', 'col-3');
+            
             newCard.setAttribute('data-category', category);
-            const linkWithQuery = `${link}?categoryName=${encodeURIComponent(category)}`;
+            newCard.classList.add('card', 'mb-3');
+            newCard.style.backgroundColor = cardColor;
 
             newCard.innerHTML = `
-              <a href="${linkWithQuery}" class="category-card" style="background-color: ${cardColor};">${category}</a>
-              <div class="dropdown position-absolute" style="top: 10px; right: 15px;">
-                <button class="btn btn-light btn-sm dropdown-toggle p-0" style="background-color: unset; border: none; " type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="bi bi-three-dots-vertical"></i>
-                </button>
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item delete-category">Delete</a></li>
-                </ul>
-              </div>
+            <div class="card-body">
+                <p class="card-title"><b>${category}</b></p>
+                <div class="btn-group d-grid" role="group">
+                    <a href="categoryLinks.html?category=${category}&owner=shared%20to%20me" class="btn btn-light flex btn-sm"
+                    style="border-radius: 10px;margin-bottom: 5px;"
+                    >Shared to me</a>
+                    <a href="categoryLinks.html?category=${category}&owner=shared%20to%20others" class="btn btn-light flex btn-sm"
+                    style="border-radius: 10px;margin-bottom: 5px;"
+                    >Shared to others</a>
+                </div>
+            </div>
             `;
-
-            // Add delete functionality to the card
-            newCard.querySelector('.delete-category').addEventListener('click', function () {
-              newCard.remove();
-              removeCategoryFromStorage(category);
-            });
 
             // Add new card to the container
             categoryContainer.appendChild(newCard);
-
-            // Save the category to sessionStorage if color is not provided (i.e., new card)
-            if (!color) {
-              saveCategoryToStorage(category, link, cardColor);
-            }
 
             // Close the modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('categoryModal'));
             if (modal) modal.hide();
           }
 
-        async function loadCategories() {
-          const url = `/read?jsonStr=${encodeURIComponent(
-            JSON.stringify({ table: "category" })
-          )}`;
+        // async function loadCategories() {
+        //   const url = `/read?jsonStr=${encodeURIComponent(
+        //     JSON.stringify({ table: "category" })
+        //   )}`;
 
-          fetch(url, {
-            method: "GET",
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              console.log("Fetched categories:", data.categories);
-              if (data.categories && data.categories.length > 0) {
-                const categorySelect = document.getElementById("category-list");
-                data.categories.forEach((categoryName) => {
-                  const listItem = document.createElement("li");
-                  listItem.className = "list-group-item";
-                  listItem.dataset.category = categoryName; // Assuming category_name is the field name
-                  listItem.dataset.link = `categoryLinks.html`; // Generate dynamic link
-                  listItem.textContent = categoryName;
+        //   fetch(url, {
+        //     method: "GET",
+        //   })
+        //     .then((response) => response.json())
+        //     .then((data) => {
+        //       console.log("Fetched categories:", data.categories);
+        //       if (data.categories && data.categories.length > 0) {
+        //         const categorySelect = document.getElementById("category-list");
+        //         data.categories.forEach((categoryName) => {
+        //           const listItem = document.createElement("li");
+        //           listItem.className = "list-group-item";
+        //           listItem.dataset.category = categoryName; // Assuming category_name is the field name
+        //           listItem.dataset.link = `categoryLinks.html`; // Generate dynamic link
+        //           listItem.textContent = categoryName;
 
-                  listItem.addEventListener('click', function () {
-                    addCategoryCard(categoryName, listItem.dataset.link);
-                  });
+        //           listItem.addEventListener('click', function () {
+        //             addCategoryCard(categoryName, listItem.dataset.link);
+        //           });
 
-                  categorySelect.appendChild(listItem);
-                });
-              } else {
-                console.log("No categories found");
-              }
-            })
-            .catch((error) => {
-              console.error("Error fetching categories:", error);
-            });
-        }
+        //           categorySelect.appendChild(listItem);
+        //         });
+        //       } else {
+        //         console.log("No categories found");
+        //       }
+        //     })
+        //     .catch((error) => {
+        //       console.error("Error fetching categories:", error);
+        //     });
+        // }
         function saveCategoryToStorage(category, link, color) {
           const categories = JSON.parse(sessionStorage.getItem('categories')) || [];
           categories.push({ category, link, color });
@@ -415,15 +401,15 @@
           sessionStorage.setItem('categories', JSON.stringify(categories));
         }
 
-        function loadCategoriesFromStorage() {
-          const categories = JSON.parse(sessionStorage.getItem('categories')) || [];
-          categories.forEach((item) => {
-            const { category, link, color } = item;
-            const categoryContainer = document.getElementById('category-container');
-            addCategoryCard(category, link, color); // Pass the color to addCategoryCard
+        // function loadCategoriesFromStorage() {
+        //   const categories = JSON.parse(sessionStorage.getItem('categories')) || [];
+        //   categories.forEach((item) => {
+        //     const { category, link, color } = item;
+        //     const categoryContainer = document.getElementById('category-container');
+        //     addCategoryCard(category, link, color); // Pass the color to addCategoryCard
             
-          });
-        }
+        //   });
+        // }
 
         async function loadSessions() {
           const url = `/read?jsonStr=${encodeURIComponent(
@@ -454,7 +440,7 @@
         }
 
         function loadUserGroups(userEmail) {
-          fetch('/getUserGroups?jsonStr=' + encodeURIComponent(JSON.stringify({ userEmail: userEmail })))
+          fetch('/getUserGroups?jsonStr=' + encodeURIComponent(JSON.stringify({ userEmail:userEmail, })))
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok ' + response.statusText);
@@ -470,6 +456,26 @@
             })
             .catch(error => {
                 console.error('Failed to fetch user groups:', error);
+            });
+        }
+
+        function loadUserCategories(userEmail) {
+          fetch('/read?jsonStr=' + encodeURIComponent(JSON.stringify({ table: "checkCategory",userEmail:userEmail, })))
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('category fetched:', data);
+                // Process and display the data
+                data.forEach(categories => {
+                  addCategoryCard(categories);
+                });
+            })
+            .catch(error => {
+                console.error('Failed to fetch category:', error);
             });
         }
 

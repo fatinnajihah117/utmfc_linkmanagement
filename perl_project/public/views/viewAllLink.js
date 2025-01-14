@@ -295,7 +295,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .then(result => {
         if (result.success) {
             alert("Link successfully shared with users.");
-            location.reload();
+
         } else {
             alert(`Failed to share link: ${result.error}`);
         }
@@ -325,7 +325,6 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(result => {
             if (result.success) {
                 alert("Link successfully shared with users.");
-                location.reload();
             } else {
                 alert(`Failed to share link: ${result.error}`);
             }
@@ -371,8 +370,7 @@ document.addEventListener("DOMContentLoaded", () => {
     session,
     owner,
     description,
-    links
-  ) {
+    links) {
     console.log(id);
     document.getElementById("updateId").value = id;
     document.getElementById("updateCategoryDropdown").value = category;
@@ -466,8 +464,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  //Search and Filter Function
-  document.addEventListener("DOMContentLoaded", () => {
+   //Search and Filter Function
+   document.addEventListener("DOMContentLoaded", () => {
     const searchInput = document.getElementById("searchInput");
     const filterDropdown = document.getElementById("filterDropdown");
     const tableBody = document.querySelector("table tbody");
@@ -503,12 +501,116 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  async function loadFilterCategories() { 
+    const url = `/read?jsonStr=${encodeURIComponent( 
+      JSON.stringify({ table: "category" }) 
+    )}`; 
+
+    fetch(url, { 
+      method: "GET", 
+    }) 
+      .then((response) => response.json()) 
+      .then((data) => { 
+        console.log("Fetched categories:", data.categories); 
+        if (data.categories && data.categories.length > 0) { 
+          const categoryDropdown = document.getElementById("filterCategoryDropdown"); 
+          categoryDropdown.innerHTML = ''; // Clear any previous categories
+          data.categories.forEach((category) => { 
+            const listItem = document.createElement("li");
+            listItem.classList.add("dropdown-item");
+            listItem.textContent = category;  // Set category name as text
+            listItem.addEventListener("click", () => {
+              // When a category is clicked, filter the table rows by that category
+              filterTableByCategory(category);
+              // Optionally, update the button text to show selected category
+              document.getElementById("filterCategoryButton").textContent = category;
+            });
+            categoryDropdown.appendChild(listItem); 
+          }); 
+        } else { 
+          console.log("No categories found"); 
+        } 
+      }) 
+      .catch((error) => { 
+        console.error("Error fetching categories:", error); 
+      }); 
+    }
+  function filterTableByCategory(selectedCategory) {
+    const tableBody = document.querySelector("table tbody");
+    Array.from(tableBody.rows).forEach((row) => {
+      const categoryCell = row.cells[1]; // Category is in the 2nd column (index 1)
+      if (categoryCell) {
+        const category = categoryCell.textContent.trim().toLowerCase();
+        if (category.includes(selectedCategory.toLowerCase())) {
+          row.style.display = "";  // Show the row
+        } else {
+          row.style.display = "none";  // Hide the row
+        }
+      }
+    });
+  }
+
+  async function loadFilterSessions() {
+    const url = `/read?jsonStr=${encodeURIComponent(
+      JSON.stringify({ table: "session" })
+    )}`;
+
+    fetch(url, {
+      method: "GET",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Fetched sessions:", data.sessions);
+        if (data.sessions && data.sessions.length > 0) {
+          const sessionDropdown = document.getElementById("filterSessionDropdown");
+          sessionDropdown.innerHTML = ''; // Clear any previous sessions
+          data.sessions.forEach((session) => {
+            const listItem = document.createElement("li");
+            listItem.classList.add("dropdown-item");
+            listItem.textContent = session;  // Set session name as text
+            listItem.addEventListener("click", () => {
+              // When a session is clicked, filter the table rows by that session
+              filterTableBySession(session);
+              // Optionally, update the button text to show selected session
+              document.getElementById("filterSessionButton").textContent = session;
+            });
+            sessionDropdown.appendChild(listItem);
+          });
+        } else {
+          console.log("No sessions found");
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching sessions:", error);
+      });
+  }
+  function filterTableBySession(selectedSession) { 
+    const tableBody = document.querySelector("table tbody"); 
+
+    Array.from(tableBody.rows).forEach((row) => { 
+      const sessionCell = row.cells[3]; // Assuming session is in the 3rd column (index 2)
+      
+      if (sessionCell) {
+        const session = sessionCell.textContent.trim().toLowerCase();
+        console.log("Checking row for session:", session); // Debugging line
+
+        // Log the selected session
+        console.log("Selected Session:", selectedSession);
+
+        if (session.includes(selectedSession.toLowerCase())) {
+          row.style.display = "";  // Show the row
+        } else {
+          row.style.display = "none";  // Hide the row
+        }
+      }
+    }); 
+  }
+
   // Attach event listeners and initialize data on page load
   document.getElementById("addForm").addEventListener("submit", addRow);
   document.getElementById("updateForm").addEventListener("submit", updateRow);
-  document.getElementById('shareToUserButton').addEventListener('click', () => {
-    shareLinkToUser(currentLinkID);
-    });
+  document.addEventListener("DOMContentLoaded", loadFilterCategories);
+  document.addEventListener("DOMContentLoaded", loadFilterSessions);
   document.addEventListener("DOMContentLoaded", loadTableData);
   document.addEventListener("DOMContentLoaded", loadCategories);
   document.addEventListener("DOMContentLoaded", loadSessions);

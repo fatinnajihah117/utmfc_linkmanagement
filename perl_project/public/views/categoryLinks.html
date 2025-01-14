@@ -350,13 +350,10 @@
       document.addEventListener("DOMContentLoaded", () => {
         // Get user role from localStorage
         const userRole = localStorage.getItem("userRole") || "UTM LECTURER";
-        console.log(localStorage.getItem("userRole"));
-        console.log(userRole);
 
-        const params = new URLSearchParams(window.location.search);
 
-    // Retrieve the categoryName parameter
-        const categoryName = params.get("categoryName");
+        const categoryName = new URLSearchParams(window.location.search).get('category');
+        console.log(categoryName);
 
         // If a category name exists, update the heading
         if (categoryName) {
@@ -379,25 +376,26 @@
           roleNavItem.textContent = userRole;
         }
       });
-      function openAddModal() {
-        // Reset the form
-        document.getElementById("addForm").reset();
-        // Show the modal
-        const modal = new bootstrap.Modal(document.getElementById("addModal"));
-        modal.show();
-      }
+      // function openAddModal() {
+      //   // Reset the form
+      //   document.getElementById("addForm").reset();
+      //   // Show the modal
+      //   const modal = new bootstrap.Modal(document.getElementById("addModal"));
+      //   modal.show();
+      // }
     </script>
     <!--JSON SCRIPT! UBAH SINI-->
     <script>
       // Load the table data with userID from localStorage
       async function loadTableData() {
         try {
-          const urlParams = new URLSearchParams(window.location.search);
-          const categoryFilter = urlParams.get("categoryName");
-          console.log(categoryFilter);
+          const categoryName = new URLSearchParams(window.location.search).get('category');
+          const ownerFilter = new URLSearchParams(window.location.search).get('owner');
+          const userEmail = localStorage.getItem("userEmail");
+          console.log("try this",categoryName);
 
-          const userID = localStorage.getItem("userId"); // Retrieve userID from localStorage
-          console.log("userID: ", localStorage.getItem("userId"));
+          const userID = localStorage.getItem("userEmail"); // Retrieve userID from localStorage
+          console.log("userEmail: ", localStorage.getItem("userEmail"));
           if (!userID) {
             alert("UserID not found. Please log in.");
             return;
@@ -405,7 +403,7 @@
 
           const jsonStr = JSON.stringify({
             table: "link",
-            userID: userID, // Pass userID to the server
+            userEmail: localStorage.getItem("userEmail"), // Pass userID to the server
           });
           console.log(jsonStr);
 
@@ -417,7 +415,14 @@
           const tableBody = document.querySelector("table tbody");
           tableBody.innerHTML = "";
 
-          const filteredData = categoryFilter? data.filter(row => row.category === categoryFilter): data;
+          const filteredData = data.filter(row => {
+            const matchesCategory = !categoryName || row.category === categoryName;
+            const matchesOwner = ownerFilter === "shared to me" 
+                ? row.owner !== userEmail
+                : row.owner === userEmail;
+
+            return matchesCategory && matchesOwner;
+        });
 
           filteredData.forEach((row, index) => {
             const tableRow = `

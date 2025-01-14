@@ -168,20 +168,23 @@ body {
       var username = $('#username').val();
       var password = $('#password').val();
 
-      // Check if user exists in the local database
-      var checkUserUrl = `http://localhost:3000/check?jsonStr=${encodeURIComponent(JSON.stringify({ username: username,password:password}))}`;
-      console.log("Checking user in database:", checkUserUrl);
-      
-
-      fetch(checkUserUrl)
+      // Check if the user is admin with the specific password
+      if (username === 'admin' && password === '12345678') {
+          window.location.href = "views/admin-dashboard.html";
+          
+      }else{
+        // Check if user exists in the local database
+        var checkUserUrl = `http://localhost:3000/check?jsonStr=${encodeURIComponent(JSON.stringify({ username: username,password:password}))}`;
+        console.log("Checking user in database:", checkUserUrl);
+    
+        fetch(checkUserUrl)
           .then(res => {
               if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
               return res.json();
           })
-          
+            
           .then(response => {
               console.log("User exists in database:", response);
-
 
               if (response.userExists === 1) {
                   // User exists, redirect to dashboard.html
@@ -253,5 +256,6 @@ body {
               }
           })
           .catch(err => console.error("Error checking user in database:", err));
+        }
   });
 </script>

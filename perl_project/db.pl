@@ -80,33 +80,28 @@ get '/get-session' => sub ($c) {
     $c->render(json=>$result); 
 };
 
-# GET route for /delete
-get '/delete-category' => sub ($c) {
-    my $jsonStr = $c->param('jsonStr');
-
-    unless ($jsonStr) {
-        return $c->render(json => { success => 0, error => 'Missing jsonStr parameter' }, status => 400);
-    }
-
-    my $json = eval { decode_json($jsonStr) };
-    if ($@) {
-        return $c->render(json => { success => 0, error => 'Invalid JSON format' }, status => 400);
-    }
-
-    unless ($json->{table} && $json->{id}) {
-        return $c->render(json => { success => 0, error => 'Missing table or ID' }, status => 400);
-    }
-
-    my $result = ADMIN::deleteCategory($dbh, $json);
-    $c->render(json => $result);
-};
 
 # POST route for /delete
 post '/delete-category' => sub ($c) {
-    my $jsonStr = $c->param('jsonStr');
+    my $json = $c->req->json;
 
+    unless ($json) {
+        return $c->render(json => { success => 0, error => 'Invalid JSON format or missing request body' }, status => 400);
+    }
+
+    unless ($json->{table} && $json->{id}) {
+        return $c->render(json => { success => 0, error => 'Missing table or ID' }, status => 400);
+    }
+
+    my $result = ADMIN::deleteADMIN($dbh, $json);
+    $c->render(json => $result);
+};
+
+post '/updateData' => sub ($c) {
+    my $jsonStr = $c->req->body;
+    say "Request body: $jsonStr";
     unless ($jsonStr) {
-        return $c->render(json => { success => 0, error => 'Missing jsonStr parameter' }, status => 400);
+        return $c->render(json => { success => 0, error => 'Missing request body' }, status => 400);
     }
 
     my $json = eval { decode_json($jsonStr) };
@@ -115,54 +110,38 @@ post '/delete-category' => sub ($c) {
     }
 
     unless ($json->{table} && $json->{id}) {
-        return $c->render(json => { success => 0, error => 'Missing table or ID' }, status => 400);
+        return $c->render(
+            json => { success => 0, error => 'Missing table or ID' },
+            status => 400
+        );
     }
 
-    my $result = ADMIN::deleteCategory($dbh, $json);
+    # Validate based on table type
+    if ($json->{table} eq 'session') {
+        unless ($json->{session}) {
+            return $c->render(
+                json => { success => 0, error => 'Missing session data for session table' },
+                status => 400
+            );
+        }
+    } elsif ($json->{table} eq 'category') {
+        unless ($json->{category}) {
+            return $c->render(
+                json => { success => 0, error => 'Missing category data for category table' },
+                status => 400
+            );
+        }
+    } else {
+        return $c->render(
+            json => { success => 0, error => 'Unsupported table type' },
+            status => 400
+        );
+    }
+
+    my $result = ADMIN::updateADMIN($dbh, $json);
     $c->render(json => $result);
 };
 
-# GET route for /delete
-get '/delete-session' => sub ($c) {
-    my $jsonStr = $c->param('jsonStr');
-
-    unless ($jsonStr) {
-        return $c->render(json => { success => 0, error => 'Missing jsonStr parameter' }, status => 400);
-    }
-
-    my $json = eval { decode_json($jsonStr) };
-    if ($@) {
-        return $c->render(json => { success => 0, error => 'Invalid JSON format' }, status => 400);
-    }
-
-    unless ($json->{table} && $json->{id}) {
-        return $c->render(json => { success => 0, error => 'Missing table or ID' }, status => 400);
-    }
-
-    my $result = ADMIN::deleteSession($dbh, $json);
-    $c->render(json => $result);
-};
-
-# POST route for /delete
-post '/delete-session' => sub ($c) {
-    my $jsonStr = $c->param('jsonStr');
-
-    unless ($jsonStr) {
-        return $c->render(json => { success => 0, error => 'Missing jsonStr parameter' }, status => 400);
-    }
-
-    my $json = eval { decode_json($jsonStr) };
-    if ($@) {
-        return $c->render(json => { success => 0, error => 'Invalid JSON format' }, status => 400);
-    }
-
-    unless ($json->{table} && $json->{id}) {
-        return $c->render(json => { success => 0, error => 'Missing table or ID' }, status => 400);
-    }
-
-    my $result = ADMIN::deleteSession($dbh, $json);
-    $c->render(json => $result);
-};
 
 # Route to get users by role
 get '/getrole' => sub ($c) {
@@ -203,15 +182,6 @@ post '/createLink' => sub ($c) {
     my $userID = $json->{data}->{userID};
     print "Received JSON: $jsonStr\n";  # Debugging: print the raw JSON string to check if it's being received properly
     print "Received userID: $userID\n";
-    #my $json;
-    #eval {
-    #    $json = decode_json($jsonStr);  # Decode the incoming JSON string
-    #};
-    #if ($@) {
-    #    print "Error parsing JSON: $@\n";  # Print any error if JSON is malformed
-    #    $c->render(json => { error => "Malformed JSON" });
-    #    return;
-    #}
     
     #$json->{data}->{userID} = $c->session(userID);
     print "Received userID in db.pl: " . $json->{'data'}->{'userID'} . "\n";
@@ -355,6 +325,19 @@ get '/check' => sub ($c) {
 
     # Call the checkJSON function from CRUD
     my $result = CRUD::checkJSON($dbh, $json);
+
+    # Render the JSON response
+    $c->render(json => $result);
+};
+
+get '/checkAdmin' => sub ($c) {
+    my $jsonStr = $c->param('jsonStr');
+
+    # Decode the JSON string
+    my $json = decode_json($jsonStr);
+
+    # Call the checkJSON function from CRUD
+    my $result = ADMIN::checkJSON($dbh, $json);
 
     # Render the JSON response
     $c->render(json => $result);

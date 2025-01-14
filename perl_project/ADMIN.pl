@@ -103,8 +103,37 @@ sub readSession {
     };
 }
 
+sub checkJSON {
+    my $dbh  = shift(@_);
+    my $json = shift(@_);
+
+    my $table = $json->{'table'};
+    
+    if($table eq "category"){
+        my $categoryName = $json->{'categoryName'};
+        my $sth = $dbh->prepare('SELECT 1 FROM link WHERE category = ?');
+        $sth->execute($categoryName);
+
+        my $inUse = $sth->fetchrow_array ? 1 : 0;
+
+        return {
+            inUse => $inUse,
+        };
+    }elsif($table eq "session"){
+        my $sessionName = $json->{'sessionName'};
+        my $sth = $dbh->prepare('SELECT 1 FROM link WHERE session = ?');
+        $sth->execute($sessionName);
+
+        my $inUse = $sth->fetchrow_array ? 1 : 0;
+
+        return {
+            inUse => $inUse,
+        };
+    }    
+}
+
 #Function Delete
-sub deleteCategory {
+sub deleteADMIN {
     my $dbh = shift(@_);
     my $json = shift(@_);
 
@@ -126,21 +155,7 @@ sub deleteCategory {
         $sth_category->execute($id) or die 'execution failed: ' . $dbh->errstr();
 
         return { success => 1, operation => "DELETE", id => $id };
-    }
-    
-    return {
-        success => 0,
-        error   => "Unsupported table: $table",
-    };
-}
-sub deleteSession {
-    my $dbh = shift(@_);
-    my $json = shift(@_);
-
-    my $table = $json->{'table'};
-    my $id = $json->{'id'};
-
-    if ($table eq "session") {
+    }elsif ($table eq "session") {
         # Check if session exists
         my $sth_check = $dbh->prepare('SELECT COUNT(*) FROM session WHERE sessionID=?');
         $sth_check->execute($id);
@@ -162,6 +177,43 @@ sub deleteSession {
         error   => "Unsupported table: $table",
     };
 }
+
+sub updateADMIN {
+    my $dbh = shift(@_);
+    my $json = shift(@_);
+
+    my $table = $json->{'table'};
+    my $id =  $json->{'id'};
+
+    if ($table eq "session") {
+        my $original_session = $json->{'original_session'};
+        my $newSessionName = $json->{'session'};
+        my $sth_session = $dbh->prepare(
+            'UPDATE session SET session_name=? WHERE sessionID=?'
+        ) or die 'prepare statement failed: ' . $dbh->errstr();
+
+        $sth_session->execute($newSessionName, $id) or die 'execution failed: ' . $dbh->errstr();
+
+        $json->{'operation'} = "UPDATE";
+        return $json;
+    }elsif ($table eq "category") {
+        my $newCategoryName = $json->{'category'};
+        my $sth_category = $dbh->prepare(
+            'UPDATE category SET category_name=? WHERE categoryID=?'
+        ) or die 'prepare statement failed: ' . $dbh->errstr();
+
+        $sth_category->execute($newCategoryName, $id) or die 'execution failed: ' . $dbh->errstr();
+
+        $json->{'operation'} = "UPDATE";
+        return $json;
+    }
+
+    return {
+        success => 0,
+        error   => "Unsupported table: $table",
+    };
+}
+
 # Function to fetch users by role
 sub getUsersByRole {
     my $dbh = shift(@_);
@@ -175,6 +227,14 @@ sub getUsersByRole {
         $sth->execute() or die 'execution failed: ' . $dbh->errstr();
         return $sth->fetchall_arrayref({});
 
+    }elsif ($table eq "checkTotal") {
+        my $sth = $dbh->prepare('SELECT role, COUNT(*) as count FROM users GROUP BY role');
+        $sth->execute() or die 'execution failed: ' . $dbh->errstr();
+        my $results = $sth->fetchall_arrayref({});
+        return {
+            success => 1,
+            data    => $results,
+        };
     }
     return {
         success => 0,

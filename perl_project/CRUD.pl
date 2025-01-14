@@ -22,6 +22,7 @@ sub checkGroupsJSON {
 
     return \@groups;
 }
+
 sub createJSON {
     my $dbh  = shift(@_);
     my $json = shift(@_);
@@ -336,6 +337,22 @@ sub readJSON {
         my $sth = $dbh->prepare('SELECT * FROM users') or die 'prepare statement failed: ' . $dbh->errstr();
         $sth->execute() or die 'execution failed: ' . $dbh->errstr();
         return $sth->fetchall_arrayref({});
+    }elsif ($table eq "checkCategory") {
+        my $sth = $dbh->prepare(
+            'SELECT DISTINCT l.category 
+             FROM link l
+             JOIN user_link ul ON l.linkID = ul.linkID
+             WHERE ul.userID = ?'
+        );
+        $sth->execute($userEmail) or die 'execution failed: ' . $dbh->errstr();
+        
+        # Fetch unique categories and return them
+        my @categories;
+        while (my $row = $sth->fetchrow_hashref) {
+            push @categories, $row->{'category'};
+        }
+
+        return \@categories;
     }
 
     return {
