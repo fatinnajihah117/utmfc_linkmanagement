@@ -16,6 +16,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       });
     }
+    const title = new URLSearchParams(window.location.search).get("title");
+    const titleElement = document.querySelector('.titleName');
+
+    if (title) {
+        titleElement.textContent = title;
+    } else {
+        titleElement.textContent = "Personal Google Drive Links"; // Fallback text
+    }
 
     document
       .getElementById("logout")
@@ -35,12 +43,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  const groupID = new URLSearchParams(window.location.search).get(
-    "groupID"
-  );
-  const session = new URLSearchParams(window.location.search).get(
-    "session"
-  );
+  const groupID = new URLSearchParams(window.location.search).get("groupID");
+  const session = new URLSearchParams(window.location.search).get("session");
+  
   const userEmail = localStorage.getItem("userEmail");
   const owner = new URLSearchParams(window.location.search).get("owner");
   const emailContainer = document.getElementById("email-container");

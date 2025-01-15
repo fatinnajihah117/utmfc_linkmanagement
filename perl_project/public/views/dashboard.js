@@ -37,16 +37,8 @@
           }
         });
 
-        // Show modal to add category
-        addCategoryBtn.addEventListener("click", function () {
-          const modal = new bootstrap.Modal(
-            document.getElementById("categoryModal")
-          );
-          modal.show();
-        });
-
           function addCategoryCard(category) {
-            console.log("category each card:",category)
+            console.log("category each cardss:",category)
             const categoryContainer = document.getElementById('category-container');
 
             // Generate a random color if none is provided
@@ -218,7 +210,7 @@
           const groupCard = document.createElement("div");
           groupCard.className = "col-md-4";
           groupCard.innerHTML = `
-            <a href="groupShareLink.html?groupID=${groupID}&session=${session}&owner=${owner}" class="group-card-link">
+            <a href="groupShareLink.html?title=${title}&groupID=${groupID}&session=${session}&owner=${owner}" class="group-card-link">
               <div class="group-card">
                 <h5 class="group-card-title">${title}</h5>
                 <p class="group-card-subtitle">${description}</p>
