@@ -272,12 +272,28 @@ sub readJSON {
     my $userEmail = $json->{'userEmail'};
     my $groupID = $json->{'groupID'};
     if ($table eq "link") {
+        # my $sth = $dbh->prepare(
+        #     'SELECT * FROM link 
+        #      JOIN user_link ON link.linkID = user_link.linkID
+        #      WHERE user_link.userID = ?'
+        # );
+        # $sth->execute($userEmail) or die 'execution failed: ' . $dbh->errstr();
+        # return $sth->fetchall_arrayref({});
+
         my $sth = $dbh->prepare(
-            'SELECT * FROM link 
-             JOIN user_link ON link.linkID = user_link.linkID
-             WHERE user_link.userID = ?'
+            'SELECT link.*, 
+                    CASE 
+                        WHEN EXISTS (
+                            SELECT 1 FROM user_link 
+                            WHERE user_link.linkID = link.linkID 
+                            AND user_link.userID != ?
+                        ) 
+                        THEN 1 ELSE 0 END AS is_shared
+             FROM link 
+             LEFT JOIN user_link ON link.linkID = user_link.linkID
+             WHERE user_link.userID = ? OR user_link.userID IS NULL'
         );
-        $sth->execute($userEmail) or die 'execution failed: ' . $dbh->errstr();
+        $sth->execute($userEmail, $userEmail) or die 'execution failed: ' . $dbh->errstr();
         return $sth->fetchall_arrayref({});
 
     }elsif ($table eq "link_group") {
@@ -338,18 +354,40 @@ sub readJSON {
         $sth->execute() or die 'execution failed: ' . $dbh->errstr();
         return $sth->fetchall_arrayref({});
     }elsif ($table eq "checkCategory") {
-        my $sth = $dbh->prepare(
-            'SELECT DISTINCT l.category 
+        # my $sth = $dbh->prepare(
+        #     'SELECT DISTINCT l.category 
+        #      FROM link l
+        #      JOIN user_link ul ON l.linkID = ul.linkID
+        #      WHERE ul.userID = ?'
+        # );
+        # $sth->execute($userEmail) or die 'execution failed: ' . $dbh->errstr();
+        
+        # # Fetch unique categories and return them
+        # my @categories;
+        # while (my $row = $sth->fetchrow_hashref) {
+        #     push @categories, $row->{'category'};
+        # }
+
+        # return \@categories;
+         my $sth = $dbh->prepare(
+            'SELECT l.category, 
+                    SUM(CASE WHEN l.owner = ? THEN 1 ELSE 0 END) AS my_links,
+                    SUM(CASE WHEN l.owner != ? THEN 1 ELSE 0 END) AS shared_links
              FROM link l
              JOIN user_link ul ON l.linkID = ul.linkID
-             WHERE ul.userID = ?'
+             WHERE ul.userID = ?
+             GROUP BY l.category'
         );
-        $sth->execute($userEmail) or die 'execution failed: ' . $dbh->errstr();
+        $sth->execute($userEmail, $userEmail, $userEmail) or die 'execution failed: ' . $dbh->errstr();
         
-        # Fetch unique categories and return them
+        # Fetch categories and counts
         my @categories;
         while (my $row = $sth->fetchrow_hashref) {
-            push @categories, $row->{'category'};
+            push @categories, {
+                category => $row->{'category'},
+                my_links => $row->{'my_links'},
+                shared_links => $row->{'shared_links'}
+            };
         }
 
         return \@categories;

@@ -75,46 +75,89 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function loadTableData() {
-    try {
+    // try {
       
-      console.log("userID: ", localStorage.getItem("userId"));
-      if (!userID) {
-        alert("UserID not found. Please log in.");
-        return;
-      }
+    //   console.log("userID: ", localStorage.getItem("userId"));
+    //   if (!userID) {
+    //     alert("UserID not found. Please log in.");
+    //     return;
+    //   }
 
-      const jsonStr = JSON.stringify({table: "link",userEmail,}); // Pass userID to the server
-      console.log(jsonStr);
+    //   const jsonStr = JSON.stringify({table: "link",userEmail,}); // Pass userID to the server
+    //   console.log(jsonStr);
 
-      const response = await fetch(`/read?jsonStr=${encodeURIComponent(jsonStr)}`);
-      const data = await response.json();
+    //   const response = await fetch(`/read?jsonStr=${encodeURIComponent(jsonStr)}`);
+    //   const data = await response.json();
 
-      const tableBody = document.querySelector("table tbody");
-      tableBody.innerHTML = "";
+    //   const tableBody = document.querySelector("table tbody");
+    //   tableBody.innerHTML = "";
 
-      data.forEach((row, index) => {
-        const tableRow = `
-          <tr data-id="${row.linkID}">
-            <td>${index + 1}</td>
-            <td>${row.category}</td>
-            <td>${row.datetime || "-"}</td>
-            <td>${row.session}</td>
-            <td class="wrap">${row.owner}</td>
-            <td class="wrap">${row.description}</td>
-            <td class="wrap"><a href="${row.links}" target="_blank">${row.links}</a></td>
-            <td class="btn-action">
-              <button class="btn-edit" onclick="openUpdateModal(${
-                row.linkID}, '${row.category}', '${row.session}',  '${row.owner}', '${
-                row.description}', '${row.links}')"><i class="bi bi-pencil-square"></i></button>
-              <button class="btn-delete" onclick="deleteRow(${row.linkID})"><i class="bi bi-trash3"></i></button>
-              <button class="btn-send" onclick="openShareModal(${row.linkID})"><i class="bi bi-send"></i></button>
-            </td>
-          </tr>
-        `;
-        tableBody.insertAdjacentHTML("beforeend", tableRow);
-      });
+    //   data.forEach((row, index) => {
+    //     const tableRow = `
+    //       <tr data-id="${row.linkID}">
+    //         <td>${index + 1}</td>
+    //         <td>${row.category}</td>
+    //         <td>${row.datetime || "-"}</td>
+    //         <td>${row.session}</td>
+    //         <td class="wrap">${row.owner}</td>
+    //         <td class="wrap">${row.description}</td>
+    //         <td class="wrap"><a href="${row.links}" target="_blank">${row.links}</a></td>
+    //         <td class="btn-action">
+    //           <button class="btn-edit" onclick="openUpdateModal(${
+    //             row.linkID}, '${row.category}', '${row.session}',  '${row.owner}', '${
+    //             row.description}', '${row.links}')"><i class="bi bi-pencil-square"></i></button>
+    //           <button class="btn-delete" onclick="deleteRow(${row.linkID})"><i class="bi bi-trash3"></i></button>
+    //           <button class="btn-send" onclick="openShareModal(${row.linkID})"><i class="bi bi-send"></i></button>
+    //         </td>
+    //       </tr>
+    //     `;
+    //     tableBody.insertAdjacentHTML("beforeend", tableRow);
+    //   });
+    // } catch (error) {
+    //   console.error("Error loading data:", error);
+    // }
+
+    try {
+        console.log("userID: ", localStorage.getItem("userId"));
+        if (!userID) {
+            alert("UserID not found. Please log in.");
+            return;
+        }
+
+        const jsonStr = JSON.stringify({ table: "link", userEmail });
+        console.log(jsonStr);
+
+        const response = await fetch(`/read?jsonStr=${encodeURIComponent(jsonStr)}`);
+        const data = await response.json();
+
+        const tableBody = document.querySelector("table tbody");
+        tableBody.innerHTML = "";
+        const filteredData = data.filter(row => row.owner === userEmail);
+        
+        filteredData.forEach((row, index) => {
+            const isShared = row.is_shared ? 'class="shared"' : '';
+            const tableRow = `
+              <tr data-id="${row.linkID}" ${isShared}>
+                <td>${index + 1}</td>
+                <td>${row.category}</td>
+                <td>${row.datetime || "-"}</td>
+                <td>${row.session}</td>
+                <td class="wrap">${row.owner}</td>
+                <td class="wrap">${row.description}</td>
+                <td class="wrap"><a href="${row.links}" target="_blank">${row.links}</a></td>
+                <td class="btn-action">
+                  <button class="btn-edit" onclick="openUpdateModal(${
+                    row.linkID}, '${row.category}', '${row.session}',  '${row.owner}', '${
+                    row.description}', '${row.links}')"><i class="bi bi-pencil-square"></i></button>
+                  <button class="btn-delete" onclick="deleteRow(${row.linkID})"><i class="bi bi-trash3"></i></button>
+                  <button class="btn-send" onclick="openShareModal(${row.linkID})"><i class="bi bi-send"></i></button>
+                </td>
+              </tr>
+            `;
+            tableBody.insertAdjacentHTML("beforeend", tableRow);
+        });
     } catch (error) {
-      console.error("Error loading data:", error);
+        console.error("Error loading data:", error);
     }
   }
 
@@ -124,7 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch(url, {method: "GET",})
       .then((response) => response.json())
       .then((data) => {
-        console.log("Fetched categories:", data.categories);
+        console.log("Fetcheddd categories:", data.categories);
         if (data.categories && data.categories.length > 0) {
           const categorySelect =document.getElementById("categoryDropdown");
           const categorySelectUpdate = document.getElementById("updateCategoryDropdown");
@@ -251,6 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const selectedGroup = document.getElementById('groupSelect').value;  // Get the selected group
         if (selectedGroup) {
             shareLinkToGroup(linkID, selectedGroup);  // Pass both linkID and selected group
+      
         } else {
             alert('Please select a group to share the link with.');
         }
@@ -294,8 +338,8 @@ document.addEventListener("DOMContentLoaded", () => {
     .then(response => response.json())
     .then(result => {
         if (result.success) {
-            alert("Link successfully shared with users.");
-
+            alert("Link successfully shared to "+emailList);
+            loadTableData();
         } else {
             alert(`Failed to share link: ${result.error}`);
         }
@@ -324,7 +368,8 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => response.json())
         .then(result => {
             if (result.success) {
-                alert("Link successfully shared with users.");
+                alert("Link successfully shared with to" + groupName);
+                loadTableData();
             } else {
                 alert(`Failed to share link: ${result.error}`);
             }
