@@ -151,6 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     row.description}', '${row.links}')"><i class="bi bi-pencil-square"></i></button>
                   <button class="btn-delete" onclick="deleteRow(${row.linkID})"><i class="bi bi-trash3"></i></button>
                   <button class="btn-send" onclick="openShareModal(${row.linkID})"><i class="bi bi-send"></i></button>
+                  <button class="btn-info" onclick="showSharedInfo(${row.linkID})"><i class="bi bi-info-circle"></i></button>
                 </td>
               </tr>
             `;
@@ -161,13 +162,68 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  async function showSharedInfo(linkID) {
+    try {
+        const responseUser = await fetch(`/readSharedInfo?linkID=${linkID}&type=user`);
+        const userData = await responseUser.json();
+
+        const responseGroup = await fetch(`/readSharedInfo?linkID=${linkID}&type=group`);
+        const groupData = await responseGroup.json();
+
+        const sharedUsers = userData.map(user => `<li>${user.userID}</li>`).join('');
+        const sharedGroups = groupData.map(group => `<li>${group.group_name}</li>`).join('');
+
+        console.log(sharedUsers);
+        console.log(sharedGroups);
+        let popupContent = '';
+
+        if (sharedUsers && sharedGroups) {
+            popupContent = `
+                <div>
+                    <h4>Shared with Users:</h4>
+                    <ul>${sharedUsers}</ul>
+                    <h4>Shared with Groups:</h4>
+                    <ul>${sharedGroups}</ul>
+                </div>
+            `;
+        } else if (sharedUsers) {
+            popupContent = `
+                <div>
+                    <h4>Shared with Users:</h4>
+                    <ul>${sharedUsers}</ul>
+                </div>
+            `;
+        } else if (sharedGroups) {
+            popupContent = `
+                <div>
+                    <h4>Shared with Groups:</h4>
+                    <ul>${sharedGroups}</ul>
+                </div>
+            `;
+        } else {
+            popupContent = `
+                <div>
+                    <p>No sharing information available. This link has not been shared to anyone yet.</p>
+                </div>
+            `;
+        }
+
+        // Display the content in the modal
+        document.getElementById("sharedInfoModalContent").innerHTML = popupContent;
+        $('#sharedInfoModal').modal('show'); // Bootstrap modal show
+    } catch (error) {
+        console.error("Error fetching shared information:", error);
+        alert("An unexpected error occurred while fetching shared information.");
+    }
+  }  
+
   async function loadCategories() {
     const url = `/read?jsonStr=${encodeURIComponent(JSON.stringify({ table: "category" }))}`;
 
     fetch(url, {method: "GET",})
       .then((response) => response.json())
       .then((data) => {
-        console.log("Fetcheddd categories:", data.categories);
+        console.log("Fetched categories:", data.categories);
         if (data.categories && data.categories.length > 0) {
           const categorySelect =document.getElementById("categoryDropdown");
           const categorySelectUpdate = document.getElementById("updateCategoryDropdown");

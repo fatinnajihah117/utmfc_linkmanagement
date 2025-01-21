@@ -528,4 +528,35 @@ sub checkJSON {
     }
 }
 
+sub readSharedInfo {
+    my $dbh = shift(@_);
+    my $linkID = shift(@_);
+    my $type = shift(@_);
+    
+    my $sth;
+    my $result;
+    
+    if ($type eq 'user') {
+        $sth = $dbh->prepare(
+            'SELECT ul.userID
+             FROM user_link ul
+             JOIN link l ON ul.linkID = l.linkID
+             WHERE ul.linkID = ? AND ul.userID != l.owner'
+        );
+        $sth->execute($linkID) or die 'execution failed: ' . $dbh->errstr();
+        $result = $sth->fetchall_arrayref({});
+    } elsif ($type eq 'group') {
+        $sth = $dbh->prepare(
+            'SELECT g.group_name
+             FROM link_group lg
+             JOIN groups g ON lg.groupID = g.groupID
+             WHERE lg.linkID = ?'
+        );
+        $sth->execute($linkID) or die 'execution failed: ' . $dbh->errstr();
+        $result = $sth->fetchall_arrayref({});
+    }
+
+    return $result // [];
+}
+
 1;

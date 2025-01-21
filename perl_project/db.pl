@@ -343,4 +343,22 @@ get '/checkAdmin' => sub ($c) {
     $c->render(json => $result);
 };
 
+get '/readSharedInfo' => sub ($c) {
+    my $linkID = $c->param('linkID');  # Get linkID from URL
+    my $type = $c->param('type');      # Get type (user or group) from URL
+    
+    # Check if both parameters are provided
+    if (!defined $linkID || !defined $type) {
+        $c->render(json => { error => "Missing linkID or type parameter" });
+        return;
+    }
+    
+    # Call the CRUD::readSharedInfo function to get the shared information
+    my $result = CRUD::readSharedInfo($dbh, $linkID, $type);
+
+    # Return the result as JSON response
+    $c->render(json => $result);
+};
+
+
 app->start;
