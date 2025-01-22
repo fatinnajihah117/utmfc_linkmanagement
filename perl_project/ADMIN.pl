@@ -64,18 +64,31 @@ sub createSession {
     };
 }
 # Function to get all rows from a table
-sub readCategory {
+sub readADMIN {
     my $dbh = shift(@_);
     my $json = shift(@_);
-
+    my $userEmail = $json->{'userEmail'};
     my $table = $json->{'table'};
     if ($table eq "category") {
-        my $sth = $dbh->prepare('SELECT * FROM category');
+        my $sth = $dbh->prepare('
+            SELECT c.categoryID, c.category_name, COUNT(l.linkID) as link_count
+            FROM category c
+            LEFT JOIN link l ON c.category_name = l.category
+            GROUP BY c.categoryID, c.category_name
+        ');
         $sth->execute() or die 'execution failed: ' . $dbh->errstr();
         
         my $categories = $sth->fetchall_arrayref({});  # Fetch results as an array of hashes
 
         return { categories => $categories };  # Return categories wrapped in a "categories" key
+    } elsif ($table eq "link") {
+        my $sth = $dbh->prepare(
+            'SELECT * FROM link 
+             JOIN user_link ON link.linkID = user_link.linkID
+             WHERE user_link.userID = ?'
+        );
+        $sth->execute($userEmail) or die 'execution failed: ' . $dbh->errstr();
+        return $sth->fetchall_arrayref({});
     }
     
     return {
@@ -89,7 +102,10 @@ sub readSession {
 
     my $table = $json->{'table'};
     if ($table eq "session") {
-        my $sth = $dbh->prepare('SELECT * FROM session');
+        my $sth = $dbh->prepare('SELECT s.sessionID, s.session_name, COUNT(l.linkID) as link_count
+            FROM session s
+            LEFT JOIN link l ON s.session_name = l.session
+            GROUP BY s.sessionID, s.session_name');
         $sth->execute() or die 'execution failed: ' . $dbh->errstr();
         
         my $sessions = $sth->fetchall_arrayref({});
@@ -170,6 +186,13 @@ sub deleteADMIN {
         $sth_session->execute($id) or die 'execution failed: ' . $dbh->errstr();
 
         return { success => 1, operation => "DELETE", id => $id };
+    }elsif ($table eq "link") {
+
+        # Delete from user_link
+        my $sth_user_link = $dbh->prepare('DELETE FROM link WHERE linkID=?');
+        $sth_user_link->execute($id) or die 'execution failed: ' . $dbh->errstr();
+
+        return { success => 1, operation => "DELETE", id => $id};
     }
     
     return {
@@ -263,6 +286,7 @@ sub getUserCounts {
     # Return counts as a JSON string
     return encode_json({ success => 1, data => \%counts });
 }
+
 
 
 1;

@@ -53,7 +53,7 @@ get '/get-category' => sub ($c) {
         return;
     }
 
-    my $result = ADMIN::readCategory($dbh, $json);
+    my $result = ADMIN::readADMIN($dbh, $json);
     $c->render(json => $result);
 };
 
@@ -213,6 +213,18 @@ get '/getUserGroups' => sub ($c) {
 
     $c->render(json => $groups);
 };
+
+get '/readLinks' => sub ($c) {
+    my $jsonStr = $c->param('jsonStr');
+
+    my $json = decode_json($jsonStr);
+    #my $userID = $c->session('userID');
+    
+     
+    my $result = ADMIN::readADMIN($dbh, $json);##it will call the readJSON from CRUD.pl
+    $c->render(json=>$result);
+};
+
 
 ### http://localhost:3000/read?jsonStr={"table":"gdlinks"}
 get '/read' => sub ($c) {

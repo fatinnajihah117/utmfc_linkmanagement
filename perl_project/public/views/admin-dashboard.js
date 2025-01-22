@@ -166,6 +166,7 @@ document.querySelectorAll(".user-link").forEach((link) => {
   //LOAD categories
   async function loadCategories() {
     try {
+      console.log("boleh baca tak");
       const jsonStr = JSON.stringify({table: "category",});
       console.log(jsonStr);
 
@@ -183,6 +184,7 @@ document.querySelectorAll(".user-link").forEach((link) => {
       <tr data-id="${category.categoryID}">
         <td>${index + 1}</td>
         <td>${category.category_name}</td>
+        <td>${category.link_count}</td>
         <td class="btn-action">
           <button class="btn-delete" onclick="deleteCategory('${category.categoryID}','${category.category_name}')">
             <i class="bi bi-trash3"></i>
