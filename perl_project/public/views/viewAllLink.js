@@ -74,7 +74,7 @@ function openAddModal() {
   modal.show();
 }
 
-async function loadTableData() {
+// async function loadTableData() {
   // try {
     
   //   console.log("userID: ", localStorage.getItem("userId"));
@@ -117,50 +117,127 @@ async function loadTableData() {
   //   console.error("Error loading data:", error);
   // }
 
-  try {
-      console.log("userID: ", localStorage.getItem("userId"));
-      if (!userID) {
-          alert("UserID not found. Please log in.");
-          return;
-      }
+//   try {
+//       console.log("userID: ", localStorage.getItem("userId"));
+//       if (!userID) {
+//           alert("UserID not found. Please log in.");
+//           return;
+//       }
 
-      const jsonStr = JSON.stringify({ table: "link", userEmail });
-      console.log(jsonStr);
+//       const jsonStr = JSON.stringify({ table: "link", userEmail });
+//       console.log(jsonStr);
 
-      const response = await fetch(`/read?jsonStr=${encodeURIComponent(jsonStr)}`);
-      const data = await response.json();
+//       const response = await fetch(`/read?jsonStr=${encodeURIComponent(jsonStr)}`);
+//       const data = await response.json();
 
-      const tableBody = document.querySelector("table tbody");
-      tableBody.innerHTML = "";
-      const filteredData = data.filter(row => row.owner === userEmail);
+//       const tableBody = document.querySelector("table tbody");
+//       tableBody.innerHTML = "";
+//       const filteredData = data.filter(row => row.owner === userEmail);
       
-      filteredData.forEach((row, index) => {
-          const isShared = row.is_shared ? 'class="shared"' : '';
-          const tableRow = `
-            <tr data-id="${row.linkID}" ${isShared}>
-              <td>${index + 1}</td>
-              <td>${row.category}</td>
-              <td>${row.datetime || "-"}</td>
-              <td>${row.session}</td>
-              <td class="wrap">${row.owner}</td>
-              <td class="wrap">${row.description}</td>
-              <td class="wrap"><a href="${row.links}" target="_blank">${row.links}</a></td>
-              <td class="btn-action">
-                <button class="btn-edit" onclick="openUpdateModal(${
-                  row.linkID}, '${row.category}', '${row.session}',  '${row.owner}', '${
-                  row.description}', '${row.links}')"><i class="bi bi-pencil-square"></i></button>
-                <button class="btn-delete" onclick="deleteRow(${row.linkID})"><i class="bi bi-trash3"></i></button>
-                <button class="btn-send" onclick="openShareModal(${row.linkID})"><i class="bi bi-send"></i></button>
-                <button class="btn-info" onclick="showSharedInfo(${row.linkID})"><i class="bi bi-info-circle"></i></button>
-              </td>
-            </tr>
-          `;
-          tableBody.insertAdjacentHTML("beforeend", tableRow);
-      });
+//       filteredData.forEach((row, index) => {
+//           const isShared = row.is_shared ? 'class="shared"' : '';
+//           const tableRow = `
+//             <tr data-id="${row.linkID}" ${isShared}>
+//               <td>${index + 1}</td>
+//               <td>${row.category}</td>
+//               <td>${row.datetime || "-"}</td>
+//               <td>${row.session}</td>
+//               <td class="wrap">${row.owner}</td>
+//               <td class="wrap">${row.description}</td>
+//               <td class="wrap"><a href="${row.links}" target="_blank">${row.links}</a></td>
+//               <td class="btn-action">
+//                 <button class="btn-edit" onclick="openUpdateModal(${
+//                   row.linkID}, '${row.category}', '${row.session}',  '${row.owner}', '${
+//                   row.description}', '${row.links}')"><i class="bi bi-pencil-square"></i></button>
+//                 <button class="btn-delete" onclick="deleteRow(${row.linkID})"><i class="bi bi-trash3"></i></button>
+//                 <button class="btn-send" onclick="openShareModal(${row.linkID})"><i class="bi bi-send"></i></button>
+//                 <button class="btn-info" onclick="showSharedInfo(${row.linkID})"><i class="bi bi-info-circle"></i></button>
+//               </td>
+//             </tr>
+//           `;
+//           tableBody.insertAdjacentHTML("beforeend", tableRow);
+//       });
+//   } catch (error) {
+//       console.error("Error loading data:", error);
+//   }
+// }
+
+let currentPage = 1;
+const rowsPerPage = 10;
+let tableData = [];
+
+async function loadTableData() {
+  try {
+    console.log("userID: ", localStorage.getItem("userId"));
+    if (!userID) {
+      alert("UserID not found. Please log in.");
+      return;
+    }
+
+    const jsonStr = JSON.stringify({ table: "link", userEmail });
+    console.log(jsonStr);
+
+    const response = await fetch(`/read?jsonStr=${encodeURIComponent(jsonStr)}`);
+    const data = await response.json();
+
+    tableData = data; // Save the data for pagination
+    renderTable(); // Render the first page
+    setupPagination();
   } catch (error) {
-      console.error("Error loading data:", error);
+    console.error("Error loading data:", error);
   }
 }
+
+function renderTable() {
+  const tableBody = document.querySelector("table tbody");
+  tableBody.innerHTML = "";
+
+  const start = (currentPage - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
+  const rows = tableData.slice(start, end);
+
+  rows.forEach((row, index) => {
+    const tableRow = `
+      <tr data-id="${row.linkID}">
+        <td>${start + index + 1}</td>
+        <td>${row.category}</td>
+        <td>${row.datetime || "-"}</td>
+        <td>${row.session}</td>
+        <td class="wrap">${row.owner}</td>
+        <td class="wrap">${row.description}</td>
+        <td class="wrap"><a href="${row.links}" target="_blank">${row.links}</a></td>
+        <td class="btn-action">
+          <button class="btn-edit" onclick="openUpdateModal(${
+            row.linkID}, '${row.category}', '${row.session}',  '${row.owner}', '${
+            row.description}', '${row.links}')"><i class="bi bi-pencil-square"></i></button>
+          <button class="btn-delete" onclick="deleteRow(${row.linkID})"><i class="bi bi-trash3"></i></button>
+          <button class="btn-send" onclick="openShareModal(${row.linkID})"><i class="bi bi-send"></i></button>
+        </td>
+      </tr>
+    `;
+    tableBody.insertAdjacentHTML("beforeend", tableRow);
+  });
+}
+
+function setupPagination() {
+  const pagination = document.getElementById("pagination");
+  pagination.innerHTML = "";
+
+  const totalPages = Math.ceil(tableData.length / rowsPerPage);
+
+  for (let i = 1; i <= totalPages; i++) {
+    const pageItem = document.createElement("li");
+    pageItem.className = `page-item ${i === currentPage ? "active" : ""}`;
+    pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+    pageItem.addEventListener("click", () => {
+      currentPage = i;
+      renderTable();
+      setupPagination();
+    });
+    pagination.appendChild(pageItem);
+  }
+}
+
 
 async function showSharedInfo(linkID) {
   try {

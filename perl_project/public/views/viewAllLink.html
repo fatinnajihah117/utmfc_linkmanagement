@@ -150,6 +150,24 @@
         flex: 1;
         min-width: 120px;
       }
+      .card-footer {
+        display: flex;
+        justify-content: space-between; /* Distribute space between elements */
+        align-items: center;
+      }
+
+      .card-footer > div {
+        margin-right: 20px; /* Add space between the "Add" button and pagination */
+      }
+      .card-footer button {
+        background-color: #900c3f;
+        color: #fff;
+        border-radius: 20px;
+        border: none;
+      }
+      .card-footer button:hover {
+        background-color: #70092f;
+      }
     </style>
   </head>
   <body>
@@ -261,14 +279,8 @@
             </button>
           </div>
           <nav>
-            <ul class="pagination mb-0">
-              <li class="page-item">
-                <a class="page-link" href="#">Previous</a>
-              </li>
-              <li class="page-item"><a class="page-link" href="#">1</a></li>
-              <li class="page-item"><a class="page-link" href="#">2</a></li>
-              <li class="page-item"><a class="page-link" href="#">3</a></li>
-              <li class="page-item"><a class="page-link" href="#">Next</a></li>
+            <ul class="pagination mb-0" id="pagination">
+
             </ul>
           </nav>
         </div>

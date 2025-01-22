@@ -210,6 +210,10 @@
           </table>
           <p class="no-results d-none" id="no-results">No results found</p>
         </div>
+        <!-- Pagination -->
+        <nav>
+          <ul class="pagination"></ul>
+        </nav>
       </div>
     </div>
 
@@ -220,10 +224,8 @@
 </html>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    // Retrieve the role from the URL
     const params = new URLSearchParams(window.location.search);
     const role = params.get("role");
-
 
     // Update the table heading dynamically
     const heading = document.querySelector("h2.mt-4");
@@ -241,69 +243,145 @@
     }
   });
 
+  let allData = []; // To store all fetched data
+  let currentPage = 1;
+  const rowsPerPage = 10;
+
   async function loadTableData() {
     try {
       // Retrieve the role filter from URL parameters
       const urlParams = new URLSearchParams(window.location.search);
       const roleFilter = urlParams.get("role"); // E.g., "Pensyarah", "Staff", "Pelajar"
-      console.log(roleFilter);
 
       const jsonStr = JSON.stringify({
         table: "users",
       });
-      console.log(jsonStr);
 
       const response = await fetch(
         `/getrole?jsonStr=${encodeURIComponent(jsonStr)}`
       );
       const data = await response.json();
 
-      // Select the table body element
-      const tableBody = document.querySelector("table tbody");
-      tableBody.innerHTML = ""; // Clear any existing rows
-
-      const filteredData = roleFilter
+      // Filter data based on role
+      allData = roleFilter
         ? data.filter((user) => user.role === roleFilter)
         : data;
 
-      // Populate the table with filtered data
-      filteredData.forEach((user, index) => {
-        const tableRow = `
-    <tr>
-      <td>${index + 1}</td>
-      <td>${user.username}</td>
-      <td>${user.full_name}</td>
-      <td>${user.email}</td>
-      <td>${user.role}</td>
-      <td><a href="admin-userLink.html?userEmail=${user.email}&role=${roleFilter}">
-        <i class="bi bi-info-circle"></i></a>
-    </tr>
-  `;
-        tableBody.insertAdjacentHTML("beforeend", tableRow);
-      });
+      currentPage = 1; // Reset to the first page
+      renderTable(); // Render the table with pagination
     } catch (error) {
       console.error("Error loading table data:", error);
     }
   }
 
-  // Trigger table loading when the page is ready
-  document.addEventListener("DOMContentLoaded", loadTableData);
+  function renderTable() {
+    const tableBody = document.querySelector("table tbody");
+    tableBody.innerHTML = ""; // Clear existing rows
 
-  function searchTable() {
-    const input = document.getElementById("search-bar").value.toLowerCase();
-    const rows = document.querySelectorAll("table tbody tr");
-    let found = false;
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const pageData = allData.slice(startIndex, endIndex);
 
-    rows.forEach((row) => {
-      const cells = row.querySelectorAll("td");
-      const match = Array.from(cells).some((cell) =>
-        cell.textContent.toLowerCase().includes(input)
-      );
-      row.style.display = match ? "" : "none";
-      if (match) found = true;
+    pageData.forEach((user, index) => {
+      const tableRow = `
+        <tr>
+          <td>${startIndex + index + 1}</td>
+          <td>${user.username}</td>
+          <td>${user.full_name}</td>
+          <td>${user.email}</td>
+          <td>${user.role}</td>
+          <td>
+            <a href="admin-userLink.html?userEmail=${user.email}&role=${
+        user.role
+      }">
+              <i class="bi bi-info-circle"></i>
+            </a>
+          </td>
+        </tr>
+      `;
+      tableBody.insertAdjacentHTML("beforeend", tableRow);
     });
 
-    document.getElementById("no-results").classList.toggle("d-none", found);
+    updatePagination();
   }
 
+  function updatePagination() {
+    const pagination = document.querySelector(".pagination");
+    if (!pagination) return;
+
+    pagination.innerHTML = ""; // Clear existing pagination
+
+    const totalPages = Math.ceil(allData.length / rowsPerPage);
+    for (let i = 1; i <= totalPages; i++) {
+      const pageItem = document.createElement("li");
+      pageItem.className = `page-item ${i === currentPage ? "active" : ""}`;
+      pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+      pageItem.addEventListener("click", (e) => {
+        e.preventDefault();
+        currentPage = i;
+        renderTable();
+      });
+      pagination.appendChild(pageItem);
+    }
+  }
+
+  function searchTable() {
+  const input = document.getElementById("search-bar").value.toLowerCase();
+
+  // If the search bar is cleared, reload all data
+  if (input.trim() === "") {
+    currentPage = 1; // Reset to the first page
+    renderTable(); // Reload the full dataset
+    document.getElementById("no-results").classList.add("d-none"); // Hide "No results" message
+    return;
+  }
+
+  // Filter data based on the search input
+  const filteredData = allData.filter((user) =>
+    Object.values(user).some((value) =>
+      String(value).toLowerCase().includes(input)
+    )
+  );
+
+  // Update the table with filtered results
+  currentPage = 1; // Reset to the first page
+  renderTableWithFilteredData(filteredData);
+
+  // Show or hide "No results" message
+  document.getElementById("no-results").classList.toggle("d-none", filteredData.length > 0);
+}
+
+// Helper function to render table with filtered data
+function renderTableWithFilteredData(filteredData) {
+  const tableBody = document.querySelector("table tbody");
+  tableBody.innerHTML = ""; // Clear existing rows
+
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const pageData = filteredData.slice(startIndex, endIndex);
+
+  pageData.forEach((user, index) => {
+    const tableRow = `
+      <tr>
+        <td>${startIndex + index + 1}</td>
+        <td>${user.username}</td>
+        <td>${user.full_name}</td>
+        <td>${user.email}</td>
+        <td>${user.role}</td>
+        <td>
+          <a href="admin-userLink.html?userEmail=${user.email}&role=${user.role}">
+            <i class="bi bi-info-circle"></i>
+          </a>
+        </td>
+      </tr>
+    `;
+    tableBody.insertAdjacentHTML("beforeend", tableRow);
+  });
+
+  updatePagination(filteredData.length);
+}
+
+
+  // Trigger table loading when the page is ready
+  document.addEventListener("DOMContentLoaded", loadTableData);
 </script>

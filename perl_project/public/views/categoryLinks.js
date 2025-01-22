@@ -13,6 +13,58 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 // Load the table data with userID from localStorage
+// async function loadTableData() {
+//   try {
+//       const userEmail = localStorage.getItem("userEmail");
+//       console.log("userEmail: ", userEmail);
+
+//       if (!userEmail) {
+//           alert("UserEmail not found. Please log in.");
+//           return;
+//       }
+
+//       const jsonStr = JSON.stringify({
+//           table: "link",
+//           userEmail: userEmail  // Pass userEmail to the server
+//       });
+//       console.log(jsonStr);
+
+//       const response = await fetch(
+//           `/read?jsonStr=${encodeURIComponent(jsonStr)}`
+//       );
+//       const data = await response.json();
+
+//       const tableBody = document.querySelector("table tbody");
+//       tableBody.innerHTML = "";
+
+//       // Filter data where the owner is not the same as the current userEmail
+//       const filteredData = data.filter(row => row.owner !== userEmail);
+
+//       // Iterate over the filtered data and generate table rows
+//       filteredData.forEach((row, index) => {
+//           const tableRow = `
+//             <tr data-id="${row.linkID}">
+//               <td>${index + 1}</td>
+//               <td>${row.category}</td>
+//               <td>${row.datetime || "-"}</td>
+//               <td>${row.session}</td>
+//               <td>${row.owner}</td>
+//               <td>${row.description}</td>
+//               <td><a href="${row.links}" target="_blank">${row.links}</a></td>
+              
+//             </tr>
+//           `;
+//           tableBody.insertAdjacentHTML("beforeend", tableRow);
+//       });
+//   } catch (error) {
+//       console.error("Error loading data:", error);
+//   }
+// }
+
+let currentPage = 1;
+const rowsPerPage = 10;
+let filteredData = [];
+
 async function loadTableData() {
   try {
       const userEmail = localStorage.getItem("userEmail");
@@ -34,30 +86,57 @@ async function loadTableData() {
       );
       const data = await response.json();
 
-      const tableBody = document.querySelector("table tbody");
-      tableBody.innerHTML = "";
-
       // Filter data where the owner is not the same as the current userEmail
-      const filteredData = data.filter(row => row.owner !== userEmail);
+      filteredData = data.filter(row => row.owner !== userEmail);
 
-      // Iterate over the filtered data and generate table rows
-      filteredData.forEach((row, index) => {
-          const tableRow = `
-            <tr data-id="${row.linkID}">
-              <td>${index + 1}</td>
-              <td>${row.category}</td>
-              <td>${row.datetime || "-"}</td>
-              <td>${row.session}</td>
-              <td>${row.owner}</td>
-              <td>${row.description}</td>
-              <td><a href="${row.links}" target="_blank">${row.links}</a></td>
-              
-            </tr>
-          `;
-          tableBody.insertAdjacentHTML("beforeend", tableRow);
-      });
+      renderTable();
+      setupPagination();
   } catch (error) {
       console.error("Error loading data:", error);
+  }
+}
+
+function renderTable() {
+  const tableBody = document.querySelector("table tbody");
+  tableBody.innerHTML = "";
+
+  // Determine which rows to show for the current page
+  const start = (currentPage - 1) * rowsPerPage;
+  const end = start + rowsPerPage;
+  const rowsToDisplay = filteredData.slice(start, end);
+
+  rowsToDisplay.forEach((row, index) => {
+      const tableRow = `
+        <tr data-id="${row.linkID}">
+          <td>${start + index + 1}</td>
+          <td>${row.category}</td>
+          <td>${row.datetime || "-"}</td>
+          <td>${row.session}</td>
+          <td>${row.owner}</td>
+          <td>${row.description}</td>
+          <td><a href="${row.links}" target="_blank">${row.links}</a></td>
+        </tr>
+      `;
+      tableBody.insertAdjacentHTML("beforeend", tableRow);
+  });
+}
+
+function setupPagination() {
+  const pagination = document.getElementById("pagination");
+  pagination.innerHTML = "";
+
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+
+  for (let i = 1; i <= totalPages; i++) {
+      const pageItem = document.createElement("li");
+      pageItem.className = `page-item ${i === currentPage ? "active" : ""}`;
+      pageItem.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+      pageItem.addEventListener("click", () => {
+          currentPage = i;
+          renderTable();
+          setupPagination();
+      });
+      pagination.appendChild(pageItem);
   }
 }
 
