@@ -148,7 +148,7 @@ body {
             <label for="email" class="right-container__label">Username</label>
             <input class="input" id="username" type="text" name="email" placeholder="Your matric number">
             <label for="email" class="right-container__label">Password</label>
-            <input class="input" id="password" type="text" class="right-container__input" name="password" placeholder="Your IC number"> 
+            <input class="input" id="password" type="password" class="right-container__input" name="password" placeholder="Your IC number"> 
         </div> 
       
         <input type="button" class="btn" id="btnLogin" value="LOG IN">
@@ -160,6 +160,7 @@ body {
 </html>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsSHA/3.2.0/sha256.min.js"></script>
 <script src="../vue.global.js"></script>
 <script>
   var authUrl = "http://web.fc.utm.my/ttms/web_man_webservice_json.cgi?entity=authentication";
@@ -168,13 +169,18 @@ body {
       var username = $('#username').val();
       var password = $('#password').val();
 
+      // Hash the password
+      var shaObj = new jsSHA("SHA-256", "TEXT");
+      shaObj.update(password);
+      var hashedPassword = shaObj.getHash("HEX");
+
       // Check if the user is admin with the specific password
       if (username === 'admin' && password === '12345678') {
           window.location.href = "views/admin-dashboard.html";
           
       }else{
         // Check if user exists in the local database
-        var checkUserUrl = `http://localhost:3000/check?jsonStr=${encodeURIComponent(JSON.stringify({ username: username,password:password}))}`;
+        var checkUserUrl = `http://localhost:3000/check?jsonStr=${encodeURIComponent(JSON.stringify({ username: username,password:hashedPassword}))}`;
         console.log("Checking user in database:", checkUserUrl);
     
         fetch(checkUserUrl)
@@ -187,28 +193,19 @@ body {
               console.log("User exists in database:", response);
 
               if (response.userExists === 1) {
-                  // User exists, redirect to dashboard.html
-                  //fetch checkurl again sbb nak store userID dan userRole
-                  fetch(checkUserUrl)
-                      .then(res => {
-                          if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-                          return res.json();
-                      })
-                      .then(userData => {
-                          console.log("Fetched user data from database:", userData);
-
-                          // Store user data in localStorage
-                          localStorage.setItem("userRole", userData.userData.role);
-                          localStorage.setItem("userEmail", userData.userData.email);
-                          localStorage.setItem("userMatric", userData.userData.username);
-                          localStorage.setItem("userName", userData.userData.full_name);
-                          localStorage.setItem("userId", userData.userData.userID);
-
-                          // Redirect to dashboard.html
-                          console.log("Redirecting to dashboard.html", localStorage);
-                          window.location.href = "views/dashboard.html";
-                      })
-                      .catch(err => console.error("Error fetching user data from database:", err));
+                if (response.passwordCorrect === 1) {
+                    // Username and password are correct
+                    console.log("Login successful. Redirecting...");
+                    localStorage.setItem("userRole", response.userData.role);
+                    localStorage.setItem("userEmail", response.userData.email);
+                    localStorage.setItem("userMatric", response.userData.username);
+                    localStorage.setItem("userName", response.userData.full_name);
+                    localStorage.setItem("userId", response.userData.userID);
+                    window.location.href = "views/dashboard.html";
+                } else {
+                    // Username exists but password is incorrect
+                    alert("Password is incorrect. Please try again.");
+                }
               } else {
                   // User not found in database, fetch from authUrl
                   console.log("User not found in database. Fetching from authUrl...");
@@ -231,6 +228,7 @@ body {
                                       email: userData.email,
                                       full_name: userData.full_name,
                                       role: userData.description,
+                                      password: hashedPassword,
                                   },
                               });
 
@@ -253,7 +251,7 @@ body {
                           }
                       })
                       .catch(err => console.error("Error fetching user data:", err));
-              }
+            }
           })
           .catch(err => console.error("Error checking user in database:", err));
         }

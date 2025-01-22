@@ -57,19 +57,36 @@ sub createJSON {
         return {success   => 1,operation => "CREATE",inserted  => $data,};
         
     } elsif ($table eq "users") {
+        # my $sth = $dbh->prepare(
+        #     'INSERT INTO users (username, email, full_name, role) VALUES (?, ?, ?, ?)'
+        # );
+
+        # my $success = $sth->execute(
+        #     $data->{'username'}, $data->{'email'},
+        #     $data->{'full_name'}, $data->{'role'}
+        # );
+
+        # unless ($success) {
+        #     return {success => 0,error   => "Execution failed: " . $dbh->errstr,};
+        # }
+        # return {success   => 1,operation => "CREATE",inserted  => $data,};
+
+        use Digest::SHA qw(sha256_hex);
+        #my $hashed_password = sha256_hex($data->{'password'});
+
         my $sth = $dbh->prepare(
-            'INSERT INTO users (username, email, full_name, role) VALUES (?, ?, ?, ?)'
+            'INSERT INTO users (username, email, full_name, role, password) VALUES (?, ?, ?, ?, ?)'
         );
 
         my $success = $sth->execute(
             $data->{'username'}, $data->{'email'},
-            $data->{'full_name'}, $data->{'role'}
+            $data->{'full_name'}, $data->{'role'}, $data->{'password'}
         );
 
         unless ($success) {
-            return {success => 0,error   => "Execution failed: " . $dbh->errstr,};
+            return {success => 0, error => "Execution failed: " . $dbh->errstr};
         }
-        return {success   => 1,operation => "CREATE",inserted  => $data,};
+        return {success => 1, operation => "CREATE", inserted => $data};
 
     }elsif($table eq "groups"){
         # Insert into groups table
@@ -503,30 +520,44 @@ sub checkJSON {
     my $json = shift(@_);
 
     my $username = $json->{'username'};
-    # Query the database for matching user credentials
-    my $sth = $dbh->prepare('SELECT * FROM users WHERE username = ?');
-    $sth->execute($username) or die "Execution failed: " . $dbh->errstr;
+    my $password = $json->{'password'};
 
-    my $result = $sth->fetchall_arrayref({});
-    my $response = {
-        success   => 1,
-        userExists => 0,
-    };
+    # Check if the username exists in the database
+    my $sth_user = $dbh->prepare('SELECT * FROM users WHERE username = ?');
+    $sth_user->execute($username) or die "Execution failed: " . $dbh->errstr;
+    my $user_result = $sth_user->fetchall_arrayref({});
 
-    # Return the result
-    if (@$result) {
-        return {
-            success   => 1,
-            userExists => 1,
-            userData  => $result->[0], # Return the first matching user
-        };
+    if (@$user_result) {
+        # Username exists, check if the password matches
+        my $sth_password = $dbh->prepare('SELECT * FROM users WHERE username = ? AND password = ?');
+        $sth_password->execute($username, $password) or die "Execution failed: " . $dbh->errstr;
+        my $password_result = $sth_password->fetchall_arrayref({});
+
+        if (@$password_result) {
+            # Username and password match
+            return {
+                success    => 1,
+                userExists => 1,
+                passwordCorrect => 1,
+                userData   => $password_result->[0],
+            };
+        } else {
+            # Username exists but password is incorrect
+            return {
+                success    => 1,
+                userExists => 1,
+                passwordCorrect => 0,
+            };
+        }
     } else {
+        # Username does not exist
         return {
-            success   => 1,
+            success    => 1,
             userExists => 0,
         };
     }
 }
+
 
 sub readSharedInfo {
     my $dbh = shift(@_);
