@@ -299,16 +299,20 @@ sub readJSON {
 
         my $sth = $dbh->prepare(
             'SELECT link.*, 
-                    CASE 
-                        WHEN EXISTS (
-                            SELECT 1 FROM user_link 
-                            WHERE user_link.linkID = link.linkID 
-                            AND user_link.userID != ?
-                        ) 
-                        THEN 1 ELSE 0 END AS is_shared
-             FROM link 
-             LEFT JOIN user_link ON link.linkID = user_link.linkID
-             WHERE user_link.userID = ? OR user_link.userID IS NULL'
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1 FROM user_link 
+                    WHERE user_link.linkID = link.linkID 
+                    AND user_link.userID != ?
+                ) 
+                OR EXISTS (
+                    SELECT 1 FROM link_group 
+                    WHERE link_group.linkID = link.linkID 
+                )
+                THEN 1 ELSE 0 END AS is_shared
+            FROM link 
+            LEFT JOIN user_link ON link.linkID = user_link.linkID
+            WHERE user_link.userID = ? OR user_link.userID IS NULL'
         );
         $sth->execute($userEmail, $userEmail) or die 'execution failed: ' . $dbh->errstr();
         return $sth->fetchall_arrayref({});

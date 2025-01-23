@@ -212,6 +212,7 @@ function renderTable() {
             row.description}', '${row.links}')"><i class="bi bi-pencil-square"></i></button>
           <button class="btn-delete" onclick="deleteRow(${row.linkID})"><i class="bi bi-trash3"></i></button>
           <button class="btn-send" onclick="openShareModal(${row.linkID})"><i class="bi bi-send"></i></button>
+          <button class="btn-info" onclick="showSharedInfo(${row.linkID})"><i class="bi bi-info-circle"></i></button>
         </td>
       </tr>
     `;

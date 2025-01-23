@@ -112,9 +112,9 @@ function renderTable() {
           <td>${row.category}</td>
           <td>${row.datetime || "-"}</td>
           <td>${row.session}</td>
-          <td>${row.owner}</td>
-          <td>${row.description}</td>
-          <td><a href="${row.links}" target="_blank">${row.links}</a></td>
+          <td class="wrap">${row.owner}</td>
+          <td class="wrap">${row.description}</td>
+          <td class="wrap"><a href="${row.links}" target="_blank">${row.links}</a></td>
         </tr>
       `;
       tableBody.insertAdjacentHTML("beforeend", tableRow);
