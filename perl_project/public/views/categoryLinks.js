@@ -373,6 +373,177 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+//Search and Filter Function
+document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.getElementById("searchInput");
+  const filterDropdown = document.getElementById("filterDropdown");
+  const sortButton = document.getElementById("sortButton");
+  const tableBody = document.querySelector("table tbody");
+
+  // Filter rows based on search query
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase();
+    Array.from(tableBody.rows).forEach((row) => {
+      const cells = Array.from(row.cells);
+      const matches = cells.some((cell) =>
+        cell.textContent.toLowerCase().includes(query)
+      );
+      row.style.display = matches ? "" : "none";
+    });
+  });
+
+  // Filter rows based on category or session
+  document.querySelectorAll(".dropdown-item").forEach((item) => {
+    item.addEventListener("click", (e) => {
+      const filterType = e.target.getAttribute("data-filter");
+
+      // Prompt user to select a value for filtering
+      const value = prompt(
+        `Enter ${filterType} to filter:`
+      ).toLowerCase();
+
+      Array.from(tableBody.rows).forEach((row) => {
+        const cellIndex = filterType === "category" ? 1 : 3; // Category: 1, Session: 3
+        const cellText = row.cells[cellIndex].textContent.toLowerCase();
+        row.style.display = cellText.includes(value) ? "" : "none";
+      });
+    });
+  });
+
+  sortButton.addEventListener("click", () => {
+    const sortOrder = sortButton.getAttribute("data-sort");
+    const rows = Array.from(tableBody.rows);
+
+    rows.sort((a, b) => {
+      const dateA = new Date(a.cells[0].textContent.trim());
+      const dateB = new Date(b.cells[0].textContent.trim());
+
+      if (sortOrder === "asc") {
+        return dateA - dateB; // Oldest to newest
+      } else {
+        return dateB - dateA; // Newest to oldest
+      }
+    });
+
+    // Append sorted rows back to the table
+    rows.forEach((row) => tableBody.appendChild(row));
+
+    // Toggle sort order
+    if (sortOrder === "asc") {
+      sortButton.setAttribute("data-sort", "desc");
+      sortButton.textContent = "Sort Oldest to Newest";
+    } else {
+      sortButton.setAttribute("data-sort", "asc");
+      sortButton.textContent = "Sort Newest to Oldest";
+    }
+  });
+});
+
+async function loadFilterCategories() { 
+  const url = `/read?jsonStr=${encodeURIComponent( 
+    JSON.stringify({ table: "category" }) 
+  )}`; 
+
+  fetch(url, { 
+    method: "GET", 
+  }) 
+    .then((response) => response.json()) 
+    .then((data) => { 
+      console.log("Fetched categories:", data.categories); 
+      if (data.categories && data.categories.length > 0) { 
+        const categoryDropdown = document.getElementById("filterCategoryDropdown"); 
+        categoryDropdown.innerHTML = ''; // Clear any previous categories
+        data.categories.forEach((category) => { 
+          const listItem = document.createElement("li");
+          listItem.classList.add("dropdown-item");
+          listItem.textContent = category;  // Set category name as text
+          listItem.addEventListener("click", () => {
+            // When a category is clicked, filter the table rows by that category
+            filterTableByCategory(category);
+            // Optionally, update the button text to show selected category
+            document.getElementById("filterCategoryButton").textContent = category;
+          });
+          categoryDropdown.appendChild(listItem); 
+        }); 
+      } else { 
+        console.log("No categories found"); 
+      } 
+    }) 
+    .catch((error) => { 
+      console.error("Error fetching categories:", error); 
+    }); 
+  }
+function filterTableByCategory(selectedCategory) {
+  const tableBody = document.querySelector("table tbody");
+  Array.from(tableBody.rows).forEach((row) => {
+    const categoryCell = row.cells[1]; // Category is in the 2nd column (index 1)
+    if (categoryCell) {
+      const category = categoryCell.textContent.trim().toLowerCase();
+      if (category.includes(selectedCategory.toLowerCase())) {
+        row.style.display = "";  // Show the row
+      } else {
+        row.style.display = "none";  // Hide the row
+      }
+    }
+  });
+}
+
+async function loadFilterSessions() {
+  const url = `/read?jsonStr=${encodeURIComponent(
+    JSON.stringify({ table: "session" })
+  )}`;
+
+  fetch(url, {
+    method: "GET",
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Fetched sessions:", data.sessions);
+      if (data.sessions && data.sessions.length > 0) {
+        const sessionDropdown = document.getElementById("filterSessionDropdown");
+        sessionDropdown.innerHTML = ''; // Clear any previous sessions
+        data.sessions.forEach((session) => {
+          const listItem = document.createElement("li");
+          listItem.classList.add("dropdown-item");
+          listItem.textContent = session;  // Set session name as text
+          listItem.addEventListener("click", () => {
+            // When a session is clicked, filter the table rows by that session
+            filterTableBySession(session);
+            // Optionally, update the button text to show selected session
+            document.getElementById("filterSessionButton").textContent = session;
+          });
+          sessionDropdown.appendChild(listItem);
+        });
+      } else {
+        console.log("No sessions found");
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching sessions:", error);
+    });
+}
+function filterTableBySession(selectedSession) { 
+  const tableBody = document.querySelector("table tbody"); 
+
+  Array.from(tableBody.rows).forEach((row) => { 
+    const sessionCell = row.cells[3]; // Assuming session is in the 3rd column (index 2)
+    
+    if (sessionCell) {
+      const session = sessionCell.textContent.trim().toLowerCase();
+      console.log("Checking row for session:", session); // Debugging line
+
+      // Log the selected session
+      console.log("Selected Session:", selectedSession);
+
+      if (session.includes(selectedSession.toLowerCase())) {
+        row.style.display = "";  // Show the row
+      } else {
+        row.style.display = "none";  // Hide the row
+      }
+    }
+  }); 
+}
+
 // Attach event listeners and initialize data on page load
 document.getElementById("addForm").addEventListener("submit", addRow);
 document
@@ -380,3 +551,5 @@ document
   .addEventListener("submit", updateRow);
 document.addEventListener("DOMContentLoaded", loadTableData);
 document.addEventListener("DOMContentLoaded", loadSessions);
+document.addEventListener("DOMContentLoaded", loadFilterCategories);
+document.addEventListener("DOMContentLoaded", loadFilterSessions);

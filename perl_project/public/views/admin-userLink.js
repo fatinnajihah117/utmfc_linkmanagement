@@ -141,6 +141,7 @@ document.addEventListener("DOMContentLoaded", loadTableData);
    document.addEventListener("DOMContentLoaded", () => {
     const searchInput = document.getElementById("searchInput");
     const filterDropdown = document.getElementById("filterDropdown");
+    const sortButton = document.getElementById("sortButton");
     const tableBody = document.querySelector("table tbody");
 
     // Filter rows based on search query
@@ -171,6 +172,34 @@ document.addEventListener("DOMContentLoaded", loadTableData);
           row.style.display = cellText.includes(value) ? "" : "none";
         });
       });
+    });
+
+    sortButton.addEventListener("click", () => {
+      const sortOrder = sortButton.getAttribute("data-sort");
+      const rows = Array.from(tableBody.rows);
+
+      rows.sort((a, b) => {
+        const dateA = new Date(a.cells[0].textContent.trim());
+        const dateB = new Date(b.cells[0].textContent.trim());
+
+        if (sortOrder === "asc") {
+          return dateA - dateB; // Oldest to newest
+        } else {
+          return dateB - dateA; // Newest to oldest
+        }
+      });
+
+      // Append sorted rows back to the table
+      rows.forEach((row) => tableBody.appendChild(row));
+
+      // Toggle sort order
+      if (sortOrder === "asc") {
+        sortButton.setAttribute("data-sort", "desc");
+        sortButton.textContent = "Sort Oldest to Newest";
+      } else {
+        sortButton.setAttribute("data-sort", "asc");
+        sortButton.textContent = "Sort Newest to Oldest";
+      }
     });
   });
 
