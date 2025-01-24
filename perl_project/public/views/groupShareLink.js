@@ -358,6 +358,7 @@ async function addParticipant(event) {
   }
 }
 async function deleteParticipant(email) {
+  if (!confirm("Are you sure you want to delete this participant?")) return;
   console.log(email);
   const data = {
     table: "user_group",

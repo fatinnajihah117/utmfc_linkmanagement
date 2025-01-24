@@ -57,14 +57,14 @@ document.addEventListener("DOMContentLoaded", function () {
       <div class="card-body" style="border-color:${cardColor};">
           <p class="card-title"><b>${category}</b></p>
           <div class="btn-group d-grid" role="group">
-              <a href="viewAllLink.html" class="btn btn-light flex btn-sm"
+              <div class="btn btn-light flex btn-sm"
               style="background-color:${cardColor};border-radius: 10px;text-align:left;margin-bottom: 5px;"
               >
               <div>My Links total: ${my_links}</div>
-              </a>
-              <a href="categoryLinks.html" class="btn btn-light flex btn-sm"
+              </div>
+              <div class="btn btn-light flex btn-sm"
               style="background-color:${cardColor};border-radius: 10px;text-align:left;margin-bottom: 5px;"
-              ><div>Shared to me: ${shared_links}</div></a>
+              ><div>Shared to me: ${shared_links}</div></div>
           </div>
       </div>
       `;

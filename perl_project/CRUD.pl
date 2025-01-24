@@ -468,20 +468,12 @@ sub deleteJSON {
     my $groupID = $json->{'groupID'};
 
     if ($table eq "link") {
-        # Validate the user has permission to delete the link
-        my $sth_check = $dbh->prepare('SELECT COUNT(*) FROM user_link WHERE linkID=? AND userID=?');
-        $sth_check->execute($id, $userID);
-        my ($count) = $sth_check->fetchrow_array();
-
-        unless ($count) {
-            return { success => 0, error => "Permission denied or record not found" };
-        }
 
         # Delete from user_link
-        my $sth_user_link = $dbh->prepare('DELETE FROM user_link WHERE linkID=? AND userID=?');
-        $sth_user_link->execute($id,$userID) or die 'execution failed: ' . $dbh->errstr();
+        my $sth_user_link = $dbh->prepare('DELETE FROM link WHERE linkID=?');
+        $sth_user_link->execute($id) or die 'execution failed: ' . $dbh->errstr();
 
-        return { success => 1, operation => "DELETE", id => $id,userID => 'userID'};
+        return { success => 1, operation => "DELETE", id => $id};
     }elsif($table eq "link_group") {
         # New logic for "link_group" table
         my $sth_check = $dbh->prepare('SELECT COUNT(*) FROM link_group WHERE linkID=? AND groupID=?');
