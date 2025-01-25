@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("Fetched sessions:", data.sessions);
+        console.log("Fetched sessions hihi:", data.sessions);
         if (data.sessions && data.sessions.length > 0) {
           const sessionSelect = document.getElementById("sessionDropdown");
           data.sessions.forEach((session) => {

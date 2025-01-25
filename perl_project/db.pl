@@ -319,6 +319,10 @@ post '/delete' => sub ($c) {
         unless ($json->{userID} && $json->{groupID}) {
             return $c->render(json => { success => 0, error => 'Missing userID or groupID' }, status => 400);
         }
+    }elsif ($table eq 'group') {
+        unless ($json->{id}) {
+            return $c->render(json => { success => 0, error => 'Missing group ID' }, status => 400);
+        }
     } else {
         return $c->render(json => { success => 0, error => 'Unsupported table' }, status => 400);
     }

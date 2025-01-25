@@ -474,6 +474,13 @@ sub deleteJSON {
         $sth_user_link->execute($id) or die 'execution failed: ' . $dbh->errstr();
 
         return { success => 1, operation => "DELETE", id => $id};
+    }elsif ($table eq "group") {
+
+        # Delete from user_link
+        my $sth_user_link = $dbh->prepare('DELETE FROM groups WHERE groupID=?');
+        $sth_user_link->execute($id) or die 'execution failed: ' . $dbh->errstr();
+
+        return { success => 1, operation => "DELETE", id => $id};
     }elsif($table eq "link_group") {
         # New logic for "link_group" table
         my $sth_check = $dbh->prepare('SELECT COUNT(*) FROM link_group WHERE linkID=? AND groupID=?');
